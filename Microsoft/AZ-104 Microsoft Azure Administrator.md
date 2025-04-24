@@ -3223,12 +3223,12 @@ A service comprised of networking tools for monitoring and diagnostics.
 
 | Monitoring Tools                                                                                                                                          | Diagnostic Tools                                                                         |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| **Topology**<br>View diagram of the resources in the virtual network.                                                                                     | **IP Flow Verify**<br>Test if traffic is allowed or denied inbound or outbound from VMs. |
-| **Connection Monitor**<br>Monitor connectivity between Azure resources on the network.                                                                    | **Next Hop**<br>Determine how traffic hops from VM to DEST.                              |
-| **Network Performance Monitor**<br>Monitor network performance and connectivity between VNets, datacenter, and/or ExpressRoute from centralized location. | **Effective Security Rules**<br>Determine effective security rules on a NIC.             |
-|                                                                                                                                                           | **Packet Capture**<br>Capture packets to and/or from a VM for analysis.                  |
-|                                                                                                                                                           | **Connection Troubleshoot**<br>Determine connectivity between SRC and DEST VM.           |
-|                                                                                                                                                           | **VPN Diagnostics**<br>Diagnose and troubleshoot gateway issues.                         |
+| **Topology** - View diagram of the resources in the virtual network.                                                                                     | **IP Flow Verify** - Test if traffic is allowed or denied inbound or outbound from VMs. |
+| **Connection Monitor** - Monitor connectivity between Azure resources on the network.                                                                    | **Next Hop** - Determine how traffic hops from VM to DEST.                              |
+| **Network Performance Monitor** - Monitor network performance and connectivity between VNets, datacenter, and/or ExpressRoute from centralized location. | **Effective Security Rules** - Determine effective security rules on a NIC.             |
+|                                                                                                                                                           | **Packet Capture** - Capture packets to and/or from a VM for analysis.                  |
+|                                                                                                                                                           | **Connection Troubleshoot** - Determine connectivity between SRC and DEST VM.           |
+|                                                                                                                                                           | **VPN Diagnostics** - Diagnose and troubleshoot gateway issues.                         |
 
 # Chapter 14 - Backup and Recovery
 
