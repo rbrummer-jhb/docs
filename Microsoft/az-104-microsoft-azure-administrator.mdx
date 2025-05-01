@@ -1,3 +1,11 @@
+---
+title: "AZ-104 Microsoft Azure Administrator"
+description: "A Cloud Guru 04/2025"
+icon: "user-tie"
+---
+
+<Icon icon="microsoft" size={64} />
+
 - Chapter 1 - Introduction
 - Chapter 2 - Supplementary
 - [Chapter 3 - Azure Administration](#chapter-3---azure-administration)
@@ -51,7 +59,9 @@ What are clouds made of?
 
 ### Overview of Azure Cloud
 
-![](../images/azure-resource-manager-1.png)
+<Frame>
+  <img src="../images/azure-resource-manager-1.png" />
+</Frame>
 
 ## Azure Portal and Cloud Shell
 
@@ -79,11 +89,11 @@ What are clouds made of?
 
 Example: create resource groups:
 
-```ps
+```powershell PowerShell
 New-AzResourceGroup -ResourceGroupName $rg -Location $location
 ```
 
-```sh
+```powershell PowerShell
 az group create -name $rg -location $location
 ```
 
@@ -91,26 +101,26 @@ az group create -name $rg -location $location
 
 To display available parameters for a cmdlet:
 
-```ps
+```powershell PowerShell
 Get-AzResourceGroup -
 ```
 
 To create a variable:
 
-```ps
+```powershell PowerShell
 $rg = Get-Az-ResourceGroup
 ```
 
 To display the variable object and/or specific properties:
 
-```ps
+```powershell PowerShell
 $rg
 $rg.ResourceId
 ```
 
 To create a VM with the CLI:
 
-```sh
+```powershell PowerShell
 az vm create `
 --resource-group $rg.ResourceGroupName `
 --location $rg.Location `
@@ -123,25 +133,25 @@ az vm create `
 
 To get storage information about Cloud Shell with PowerShell:
 
-```
+```powershell PowerShell
 Get-CloudDrive
 ```
 
 To get resources in table format with PowerShell:
 
-```ps
+```powershell PowerShell
 Get-AzResource | Format-Table
 ```
 
 Here is a cleaner script to delete all resources.
 
-> [!note]
->
-> **This operation is destructive. Be careful.**
+<Warning>
 
-`removeAll.json`
+**This operation is destructive. Be careful.**
 
-```json
+</Warning>
+
+```json removeAll.json
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
@@ -153,9 +163,12 @@ Here is a cleaner script to delete all resources.
 }
 ```
 
-```ps
+```bash Bash
 $rg = az group list --query [].name -o tsv
-az deployment group create --resource-group $rg --mode Complete --template-file ~/removeAll.json
+az deployment group create \
+--resource-group $rg \
+--mode Complete \
+--template-file ~/removeAll.json
 ```
 
 ## ARM Templates
@@ -239,7 +252,9 @@ Skeleton template:
 
 ### Hierarchy
 
-![](hierarchy.png)
+<Frame>
+  <img src="../images/hierarchy.png" />
+</Frame>
 
 - Root management group access is not given by default.
 - Root management group cannot be moved or deleted.
@@ -305,19 +320,19 @@ Storage accounts can have a name with only 128 characters.
 
 To update Resource Group tags with Azure CLI:
 
-```sh
+```bash Bash
 az group update -n <name> --tags key1=value1 key2=value2
 ```
 
 To remove tags for a VM:
 
-```sh
+```bash Bash
 az vm update -g <resource-group-name> -n <name> update --remove tags
 ```
 
 To update tags for a VM:
 
-```sh
+```bash Bash
 az vm update -g <resource-group-name> -n <name> update \
 --set tags.key1=value1 \
 --set tags.key2=value2
@@ -325,7 +340,7 @@ az vm update -g <resource-group-name> -n <name> update \
 
 To update tags for a Virtual Network:
 
-```sh
+```bash Bash
 az network vnet update -g <resource-group-name> -n <name> \
 --set tags.key1=value1 \
 --set tags.key2=value2
@@ -347,10 +362,11 @@ az network vnet update -g <resource-group-name> -n <name> \
 
 ### Moving Resources
 
-> [!note]
->
-> Moving resources is a **write** operation.
+<Note>
 
+Moving resources is a **write** operation.
+
+</Note>
 ## Managing Azure Costs
 
 ### What Impact Costs
@@ -435,13 +451,18 @@ az network vnet update -g <resource-group-name> -n <name> \
 
 ### Azure AD Tenant Architecture
 
-> [!note]
->
-> Azure Active Directory is a **global** service.
+<Note>
 
-![](azure-ad-global.png)
+Azure Active Directory is a **global** service.
 
-![](azure-ad-tenant.png)
+</Note>
+<Frame>
+  <img src="../images/azure-ad-global.png" />
+</Frame>
+
+<Frame>
+  <img src="../images/azure-ad-tenant.png" />
+</Frame>
 
 ### Azure AD Features
 
@@ -560,7 +581,9 @@ You can bulk create users using a `csv` file. The file must have the right amoun
 
 ### Practical Use
 
-![](dynamic-groups.png)
+<Frame>
+  <img src="../images/dynamic-groups.png" />
+</Frame>
 
 ## Creating Administrative Units
 
@@ -570,7 +593,9 @@ Allows the creation of logical containers that to separate duties of administrat
 
 ### Business Use Cases
 
-![](administrative-unit.png)
+<Frame>
+  <img src="../images/administrative-unit.png" />
+</Frame>
 
 ### Demo
 
@@ -582,10 +607,11 @@ Allows the creation of logical containers that to separate duties of administrat
 
 - Logically divide the organization and allow for scoping.
 
-> [!note]
->
-> Microsoft Entra ID > Administrative units.
+<Note>
 
+Microsoft Entra ID > Administrative units.
+
+</Note>
 ## Configuring SSPR
 
 ### Description
@@ -636,10 +662,11 @@ Localization > Verification > Authentication > Password Reset > Notification
 
 ### Demo
 
-> [!note]
->
-> Microsoft Entra ID > Password reset > Self service password reset enabled
+<Note>
 
+Microsoft Entra ID > Password reset > Self service password reset enabled
+
+</Note>
 ## Azure AD Device Management
 
 ### Basics of Device Identity
@@ -655,10 +682,11 @@ Localization > Verification > Authentication > Password Reset > Notification
 
 ### Demo
 
-> [!note]
->
-> Microsoft Entra ID > Manage > Devices.
+<Note>
 
+Microsoft Entra ID > Manage > Devices.
+
+</Note>
 # Chapter 6 - Role-Based Access Control
 
 - [Understanding Roles in Azure](#understanding-roles-in-azure)
@@ -704,7 +732,9 @@ Roles for managing identities.
 
 ### RBAC Architecture
 
-![](rbac-architecture.png)
+<Frame>
+  <img src="../images/rbac-architecture.png" />
+</Frame>
 
 ## Assigning Access to Resources
 
@@ -741,13 +771,13 @@ Contributor:
 
 Login to an Azure tenant using a Service Principal:
 
-```sh
+```bash Bash
 az login --service-principal --username <username> --password <secret> --tenant <id>
 ```
 
 List role definitions and assignments:
 
-```sh
+```bash Bash
 az role definitions list
 az role assignments list --all
 ```
@@ -793,9 +823,9 @@ Custom role:
 
 ### Demo
 
-Custom role definition - `helpDeskAdminRole.json`:
+Custom role definition:
 
-```json
+```json helpDeskAdminRole.json
 {
   "Name": "Helpdesk Administrator",
   "Description": "Can Read, Restart VMs, and log support tickets with Microsoft",
@@ -813,7 +843,7 @@ Custom role definition - `helpDeskAdminRole.json`:
 
 Create the role definition:
 
-```sh
+```bash Bash
 az role definition create --role-definition helpDeskAdminRole.json
 ```
 
@@ -854,10 +884,11 @@ Top-level storage solution for storage sub-services.
   - 1 or more Availability Zones (redundant power, cooling, networking)
     - 1 or more datacenters
 
-> [!note]
->
-> You want to have at least 3 copies of your data.
+<Note>
 
+You want to have at least 3 copies of your data.
+
+</Note>
 - **LRS (Locally Redundant Storage)** - All 3 copies of data inside a single Availability Zone.
 - **ZRS (Zone Redundant Storage)** - a single copy of data inside each Availability Zone.
 - **GRS (Geo-Redundant Storage)** - 3 copies of data inside a single Availability Zone in 2 Regions.
@@ -908,7 +939,9 @@ Object replication asynchronously copies block blobs between storage accounts.
 
 ### Conceptualizing Object Replication
 
-![](object-replication.png)
+<Frame>
+  <img src="../images/object-replication.png" />
+</Frame>
 
 ### Benefits
 
@@ -921,10 +954,11 @@ Object replication asynchronously copies block blobs between storage accounts.
 
 Under Data management > Object replication.
 
-> [!tip]
->
-> Blob storage is a flat file structure, but prefixes `/` can be used to represent folders.
+<Tip>
 
+Blob storage is a flat file structure, but prefixes `/` can be used to represent folders.
+
+</Tip>
 ## Configuring Blob Lifecycle Management
 
 ### Description
@@ -943,7 +977,9 @@ Under Data management > Object replication.
 
 ### Conceptualizing Lifecycle Management
 
-![](blob-lifecycle-management.png)
+<Frame>
+  <img src="../images/blob-lifecycle-management.png" />
+</Frame>
 
 ### Demo
 
@@ -958,23 +994,24 @@ Under Data management > Lifecycle management.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Storage Accounts**
-> Support GPv2 storage accounts and Blob storage accounts.
->
-> **Types and Subtypes**
-> Support block and append blobs, and support subtypes, such as base blobs, snapshots, and version.
->
-> **Filtering**
-> Filter blobs in the rule using prefix or blob index matches.
->
-> **Scoping**
-> Scope at the storage account level or limit blobs with filters.
->
-> **If/Then Logic**
-> Uses logic in lifecycle rules to move blobs through access tiers based on modification and access times.
+<Note>
 
+**Storage Accounts**
+Support GPv2 storage accounts and Blob storage accounts.
+
+**Types and Subtypes**
+Support block and append blobs, and support subtypes, such as base blobs, snapshots, and version.
+
+**Filtering**
+Filter blobs in the rule using prefix or blob index matches.
+
+**Scoping**
+Scope at the storage account level or limit blobs with filters.
+
+**If/Then Logic**
+Uses logic in lifecycle rules to move blobs through access tiers based on modification and access times.
+
+</Note>
 ## Configuring Azure Files
 
 ### Description
@@ -1015,23 +1052,25 @@ Under Data management > Lifecycle management.
 
 - Data encrypted at rest by default and in transit over HTTPS and SMB.
 
-> [!tip]
->
-> NFS connectivity is only supported internally.
+<Tip>
 
+NFS connectivity is only supported internally.
+
+</Tip>
 ### Key Takeaways
 
-> [!note]
->
-> **Managed File Share**
-> Utilizes storage account redundancy and security.
->
-> **Operating Systems**
-> Windows, Linux and macOS support.
->
-> **File Share Quota**
-> 5 TB default size.
+<Note>
 
+**Managed File Share**
+Utilizes storage account redundancy and security.
+
+**Operating Systems**
+Windows, Linux and macOS support.
+
+**File Share Quota**
+5 TB default size.
+
+</Note>
 ## Configuring Azure File Sync
 
 ### Description
@@ -1059,21 +1098,24 @@ Under Data management > Lifecycle management.
 
 ### File Sync Cloud Tiering
 
-![](file-sync-cloud-tiering.png)
+<Frame>
+  <img src="../images/file-sync-cloud-tiering.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Extends On-Premises File Share**
-> Increase storage capacity through cloud tiering.
->
-> **Windows Only**
-> Windows 2012 R2 or later file servers only.
->
-> **Requires File Sync Agent**
-> Download Azure File Sync agent onto local file server.
+<Note>
 
+**Extends On-Premises File Share**
+Increase storage capacity through cloud tiering.
+
+**Windows Only**
+Windows 2012 R2 or later file servers only.
+
+**Requires File Sync Agent**
+Download Azure File Sync agent onto local file server.
+
+</Note>
 ## Storage Network Access
 
 ### Storage Access Options
@@ -1094,7 +1136,9 @@ Under Data management > Lifecycle management.
 
 `https://<accountName>.<subService>.core.windows.net/<resourceName>`
 
-![](public-endpoints.png)
+<Frame>
+  <img src="../images/public-endpoints.png" />
+</Frame>
 
 ### Providing Network Access
 
@@ -1134,14 +1178,15 @@ You can generate SAS tokens on the Storage Account, storage container and indivi
 
 ### Key Takeaways
 
-> [!note]
->
-> **Access Keys**
->
-> **Share Access Signature (SAS)**
->
-> **Azure AD Authentication**
+<Note>
 
+**Access Keys**
+
+**Share Access Signature (SAS)**
+
+**Azure AD Authentication**
+
+</Note>
 ## Using Azure Jobs
 
 ### Description
@@ -1181,18 +1226,19 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Import Jobs**
-> Send large amounts of data to the Azure cloud when network bandwidth won't support data migration.
->
-> **Export Jobs**
-> Receive large amounts of data on-premises from the Azure cloud when network bandwidth won't support data migration.
->
-> **WAImportExport CLI Tool**
-> Use to prepare disks for data and to estimate number of disks needed.
-> **Windows Support Only** > **Azure Blob and Files**
+<Note>
 
+**Import Jobs**
+Send large amounts of data to the Azure cloud when network bandwidth won't support data migration.
+
+**Export Jobs**
+Receive large amounts of data on-premises from the Azure cloud when network bandwidth won't support data migration.
+
+**WAImportExport CLI Tool**
+Use to prepare disks for data and to estimate number of disks needed.
+**Windows Support Only** > **Azure Blob and Files**
+
+</Note>
 ## Storage Utilities
 
 ### Description
@@ -1240,7 +1286,9 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Traditional vs Virtual Networks
 
-![](trad-vs-vnets.png)
+<Frame>
+  <img src="../images/trad-vs-vnets.png" />
+</Frame>
 
 ### Describing Virtual Networks
 
@@ -1272,17 +1320,18 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Isolated Network**
-> VNets are isolated networks on Azure cloud.
->
-> **Private Network Access**
-> Provides private connectivity between resources like VMs or App Service.
->
-> **Network Integration**
-> Allows connectivity between VNets, on-prem networks, and remote user devices.
+<Note>
 
+**Isolated Network**
+VNets are isolated networks on Azure cloud.
+
+**Private Network Access**
+Provides private connectivity between resources like VMs or App Service.
+
+**Network Integration**
+Allows connectivity between VNets, on-prem networks, and remote user devices.
+
+</Note>
 ## Creating Virtual Networks
 
 ### Designing a Network
@@ -1329,30 +1378,33 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Demo
 
-![](subnetting.png)
+<Frame>
+  <img src="../images/subnetting.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Default Connectivity**
-> By default, intra-network traffic and outbound internet traffic is allowed.
->
-> **Address Restrictions**
-> Use of private addresses using RFC 1918 provide best results. The smallest VNet/subnet size allowed is `/29` and the largest is `/8`.
->
-> **Reserved IPs**
-> Azure reserved IPs are `x.x.x.0-3` and `x.x.x.255`.
->
-> **DNS and DHCP**
-> Azure-provided DNS or custom DNS. For VNets, DHCP is built-in.
->
-> **Network Integration**
-> VNets are built for integration with one another, hybrid connectivity using VPNs, and ExpressRoute.
->
-> **Supported Protocols**
-> VNet support TCP, UDP, and ICMP protocols.
+<Note>
 
+**Default Connectivity**
+By default, intra-network traffic and outbound internet traffic is allowed.
+
+**Address Restrictions**
+Use of private addresses using RFC 1918 provide best results. The smallest VNet/subnet size allowed is `/29` and the largest is `/8`.
+
+**Reserved IPs**
+Azure reserved IPs are `x.x.x.0-3` and `x.x.x.255`.
+
+**DNS and DHCP**
+Azure-provided DNS or custom DNS. For VNets, DHCP is built-in.
+
+**Network Integration**
+VNets are built for integration with one another, hybrid connectivity using VPNs, and ExpressRoute.
+
+**Supported Protocols**
+VNet support TCP, UDP, and ICMP protocols.
+
+</Note>
 ## Deploying Network Resources
 
 ### IP Addressing
@@ -1398,17 +1450,18 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Private IPs**
-> Statically or dynamically assigned addresses that allow private connectivity between resources.
->
-> **Public IPs**
-> Statically or dynamically assigned addresses that allow public connectivity from the internet to a resource. Two types of public IP SKUs:
->
-> - Basic
-> - Standard
+<Note>
 
+**Private IPs**
+Statically or dynamically assigned addresses that allow private connectivity between resources.
+
+**Public IPs**
+Statically or dynamically assigned addresses that allow public connectivity from the internet to a resource. Two types of public IP SKUs:
+
+- Basic
+- Standard
+
+</Note>
 ## Routing Virtual Networks
 
 ### Describing Routing
@@ -1442,14 +1495,15 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Key Takeaways
 
-> [!note]
->
-> **System Routes** > **Default routes** built-in to virtual networks that **cannot** be modified.
->
-> **Custom Routes** > **User-defined routes** or BGP routes that **override system routes**.
->
-> **Custom > BPG > System** routes.
+<Note>
 
+**System Routes** > **Default routes** built-in to virtual networks that **cannot** be modified.
+
+**Custom Routes** > **User-defined routes** or BGP routes that **override system routes**.
+
+**Custom > BPG > System** routes.
+
+</Note>
 ## Network Security Groups
 
 ### Defining NSGs
@@ -1484,24 +1538,27 @@ Move large amounts of data between on-premises and Azure Storage.
 
 ### Architecting NSGs
 
-![](architecting-nsgs.png)
+<Frame>
+  <img src="../images/architecting-nsgs.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Traffic Filtering**
-> Allow or deny traffic using rules that are defined by properties such as priority, port, protocol, source, destination, and action.
->
-> **Association**
-> NSGs can be associated with subnets or NICs of virtual machines. When unassociated, they have no effect on traffic.
->
-> **Rules**
-> Default rules that cannot be deleted and user-defined rules that can be created.
->
-> **Follow the Traffic**
-> Evaluate rules by following the traffic. Inbound traffic checks the subnet, then the NIC for NSGs. Outbound traffic checks the NIC, then the subnet for NSGs. Intra-net traffic is affected.
+<Note>
 
+**Traffic Filtering**
+Allow or deny traffic using rules that are defined by properties such as priority, port, protocol, source, destination, and action.
+
+**Association**
+NSGs can be associated with subnets or NICs of virtual machines. When unassociated, they have no effect on traffic.
+
+**Rules**
+Default rules that cannot be deleted and user-defined rules that can be created.
+
+**Follow the Traffic**
+Evaluate rules by following the traffic. Inbound traffic checks the subnet, then the NIC for NSGs. Outbound traffic checks the NIC, then the subnet for NSGs. Intra-net traffic is affected.
+
+</Note>
 ## Using Azure DNS
 
 ### Describing Azure DNS
@@ -1528,16 +1585,17 @@ You can add a virtual network link to a Private DNS zone.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Features:**
->
-> - Role-Based Access Control (RBAC)
-> - Activity logs
-> - Resource locking
-> - Private DNS zone
-> - Alias records
+<Note>
 
+**Features:**
+
+- Role-Based Access Control (RBAC)
+- Activity logs
+- Resource locking
+- Private DNS zone
+- Alias records
+
+</Note>
 ## Using Azure Firewall
 
 ### Description
@@ -1545,11 +1603,14 @@ You can add a virtual network link to a Private DNS zone.
 - Filter traffic with a Platform as a Service (PaaS) firewall.
 - Fully qualified domain name (FQDN) support.
 
-> [!tip]
->
-> An `AzureFirewallSubnet` has to be created with a `/26` or lower CIDR range, because the firewall will use those IP addresses for scaling.
+<Tip>
 
-![](azure-firewall.png)
+An `AzureFirewallSubnet` has to be created with a `/26` or lower CIDR range, because the firewall will use those IP addresses for scaling.
+
+</Tip>
+<Frame>
+  <img src="../images/azure-firewall.png" />
+</Frame>
 
 ### Features
 
@@ -1575,12 +1636,15 @@ You can add a virtual network link to a Private DNS zone.
 
 ### Implementation
 
-![](az-firewall-implementation.png)
+<Frame>
+  <img src="../images/az-firewall-implementation.png" />
+</Frame>
 
-> [!tip]
->
-> The route table's next hop type has to be configured to a **Virtual Appliance** and the next hop address has to be the **private** IP address of the firewall.
+<Tip>
 
+The route table's next hop type has to be configured to a **Virtual Appliance** and the next hop address has to be the **private** IP address of the firewall.
+
+</Tip>
 ### Lab: Attaching a Firewall to a VNet in Azure
 
 - Create a subnet called `AzureFirewallSubnet`.
@@ -1635,15 +1699,16 @@ You can now login to the virtual machine using the **firewall's public IP addres
 
 ### Key Takeaways
 
-> [!note]
->
-> The firewall is secured by:
->
-> - NAT rules
-> - Network rules
-> - Application rules
-> - OR Azure Policy
+<Note>
 
+The firewall is secured by:
+
+- NAT rules
+- Network rules
+- Application rules
+- OR Azure Policy
+
+</Note>
 ## Using Service Endpoints
 
 ### Accessing PaaS Services
@@ -1669,7 +1734,7 @@ You can now login to the virtual machine using the **firewall's public IP addres
 
 To list the available service endpoints for a region:
 
-```sh
+```bash Bash
 az network service-endpoint list --location <region>
 ```
 
@@ -1678,14 +1743,15 @@ az network service-endpoint list --location <region>
 
 ### Key Takeaways
 
-> [!note]
->
-> Enable private connectivity to your services.
->
-> - Decreased attack surface.
-> - Enables use of NSG rules.
-> - Enhanced routing.
+<Note>
 
+Enable private connectivity to your services.
+
+- Decreased attack surface.
+- Enables use of NSG rules.
+- Enhanced routing.
+
+</Note>
 ## Using Private Endpoints
 
 ### Description
@@ -1697,13 +1763,16 @@ Using Azure Private Link, you can connect your services a **connected resources*
 
 Provides direct service (sub-resource) mapping.
 
-> [!tip]
->
-> Network Security Groups on subnets are **disabled for Private Endpoints only** in the subnet.
+<Tip>
 
+Network Security Groups on subnets are **disabled for Private Endpoints only** in the subnet.
+
+</Tip>
 ### Hybrid Network Environments
 
-![](hybrid-network-environments.png)
+<Frame>
+  <img src="../images/hybrid-network-environments.png" />
+</Frame>
 
 ### Creating a Private Endpoint
 
@@ -1711,13 +1780,14 @@ Search for **Private Link**.
 
 ### Key Takeaways
 
-> [!note]
->
-> - A private IP for your connected services.
-> - Connectivity to Azure services.
-> - Connectivity to customer/partner services.
-> - Direct service (sub-resource) mapping.
+<Note>
 
+- A private IP for your connected services.
+- Connectivity to Azure services.
+- Connectivity to customer/partner services.
+- Direct service (sub-resource) mapping.
+
+</Note>
 # Chapter 9 - Intersite Connectivity
 
 - [Azure VNet Peering](#azure-vnet-peering)
@@ -1745,7 +1815,9 @@ Search for **Private Link**.
 
 - Peerings can be same region or cross-region (global).
 
-![](vnet-peering.png)
+<Frame>
+  <img src="../images/vnet-peering.png" />
+</Frame>
 
 ### Benefits
 
@@ -1756,37 +1828,39 @@ Search for **Private Link**.
   - AAD tenants via Azure roles
   - Azure regions
 
-> [!tip]
->
-> Avoid overlapping CIDRs when peering.
+<Tip>
 
+Avoid overlapping CIDRs when peering.
+
+</Tip>
 ### Implementation
 
 On a VNet under **Settings** > **Peering**.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Types of Peering**
->
-> - Virtual network peering.
-> - Global virtual network peering.
->
-> **Benefits**
->
-> - Low-latency, high-bandwidth connections.
-> - Cross-network communications.
-> - Data transfer between/across subscriptions, AAD tenants via Azure roles, and regions.
->
-> **Transivity**
->
-> - Peering connections are non-transitive.
->
-> **Reciprocity**
->
-> - Peering connections are not reciprocal.
+<Note>
 
+**Types of Peering**
+
+- Virtual network peering.
+- Global virtual network peering.
+
+**Benefits**
+
+- Low-latency, high-bandwidth connections.
+- Cross-network communications.
+- Data transfer between/across subscriptions, AAD tenants via Azure roles, and regions.
+
+**Transivity**
+
+- Peering connections are non-transitive.
+
+**Reciprocity**
+
+- Peering connections are not reciprocal.
+
+</Note>
 ## Implementing VPNs
 
 ### VPN Gateway vs VNet Peering
@@ -1802,7 +1876,9 @@ Components:
 
 ### Capabilities of VPN Gateways
 
-![](vpn-capabilities.png)
+<Frame>
+  <img src="../images/vpn-capabilities.png" />
+</Frame>
 
 ### Routing Types & VPN Gateway SKUs
 
@@ -1824,17 +1900,22 @@ VPN Gateway SKUs
 | VpnGw2AZ | Max: 30              | 1 Gbps     | Yes         |
 | VpnGw3AZ | Max: 30              | 1.25 Gbps  | Yes         |
 
-> [!note]
->
-> Basic VPN gateway should only be used in dev/test workloads and it does not support migrating between SKUs.
+<Note>
 
+Basic VPN gateway should only be used in dev/test workloads and it does not support migrating between SKUs.
+
+</Note>
 ### Active-Active vs Active-Passive
 
-![](active-active-passive-vpn-gw.png)
+<Frame>
+  <img src="../images/active-active-passive-vpn-gw.png" />
+</Frame>
 
 ### Implementing VPN Gateway
 
-![](vpn-gw-implementation.png)
+<Frame>
+  <img src="../images/vpn-gw-implementation.png" />
+</Frame>
 
 ## ExpressRoute
 
@@ -1846,7 +1927,9 @@ Used to make a direct physical connection into Azure & Microsoft resources.
 - Needs a Virtual Network Gateway
 - On-prem needs a ASN number, a VLAN ID, 2 `/30` gateway subnets each with 4 addresses - 2 to maintain connection to ExpressRoute and have a BGP session to exchange routes, a shared key, and public IP addresses to advertise for Microsoft peering.
 
-![](expressroute%201.png)
+<Frame>
+  <img src="../images/expressroute%201.png" />
+</Frame>
 
 ### Implementation
 
@@ -1859,37 +1942,43 @@ Used to make a direct physical connection into Azure & Microsoft resources.
 
 ### Configuration
 
-> [!note]
->
-> **ExpressRoute Direct** provides a direct connection into Microsoft without using a provider.
+<Note>
 
+**ExpressRoute Direct** provides a direct connection into Microsoft without using a provider.
+
+</Note>
 - Search for **ExpressRoute circuits**.
 
 ### Key Takeaways
 
-> [!note]
->
-> - Dedicated physical connection.
-> - Built-in redundancy.
-> - Connectivity to Microsoft.
-> - Connectivity via private peering.
-> - Dynamic routing via BGP.
-> - 50 Mbps - 10 Gbps.
-> - Not encrypted by default.
+<Note>
 
+- Dedicated physical connection.
+- Built-in redundancy.
+- Connectivity to Microsoft.
+- Connectivity via private peering.
+- Dynamic routing via BGP.
+- 50 Mbps - 10 Gbps.
+- Not encrypted by default.
+
+</Note>
 ## Virtual WAN
 
 ### Description
 
 A single operational interface to manage connections, firewalls, and routes - the entire network topology.
 
-![](virtual-wan.png)
+<Frame>
+  <img src="../images/virtual-wan.png" />
+</Frame>
 
 ### Hub-to-Hub Connectivity
 
 Allows the creation of full mesh networks.
 
-![](hub-to-hub-connectivity.png)
+<Frame>
+  <img src="../images/hub-to-hub-connectivity.png" />
+</Frame>
 
 ### Virtual WAN SKUs
 
@@ -1906,16 +1995,17 @@ Allows the creation of full mesh networks.
 
 ### Key Takeaways
 
-> [!note]
->
-> - Connect networks using hub-spoke architecture.
-> - Basic and Standard SKUs.
-> - Connect S2S and P2S VPN gateways, global reach ExpressRoute, and VNets.
-> - Secure with Azure Firewall and Firewall Manager.
-> - Any-to-any connectivity.
-> - Connections propagated to managed routes.
-> - Managed Virtual Network.
+<Note>
 
+- Connect networks using hub-spoke architecture.
+- Basic and Standard SKUs.
+- Connect S2S and P2S VPN gateways, global reach ExpressRoute, and VNets.
+- Secure with Azure Firewall and Firewall Manager.
+- Any-to-any connectivity.
+- Connections propagated to managed routes.
+- Managed Virtual Network.
+
+</Note>
 # Chapter 10 - Azure Virtual Machines
 
 - [Creating and Managing Virtual Machines](#creating-and-managing-virtual-machines)
@@ -1968,7 +2058,9 @@ Allows the creation of full mesh networks.
 
 ### Architecture
 
-![](vm-architecture.png)
+<Frame>
+  <img src="../images/vm-architecture.png" />
+</Frame>
 
 ### Demo
 
@@ -2005,21 +2097,23 @@ Azure VM workloads with specific configurations and additional resources can pro
 
 ### Key Takeaways
 
-> [!note]
->
-> **CPU/Memory**
-> Sizing determines CPU and memory.
->
-> **Networking**
-> VMs use VNets, NICs, and NSGs to determine connectivity.
->
-> **Storage**
-> VMs use Azure Disks to store OS, non-persistent, and persistent data.
+<Note>
 
-> [!tip]
->
-> Security for VMs can be managed by opening ports on a NSG.
+**CPU/Memory**
+Sizing determines CPU and memory.
 
+**Networking**
+VMs use VNets, NICs, and NSGs to determine connectivity.
+
+**Storage**
+VMs use Azure Disks to store OS, non-persistent, and persistent data.
+
+</Note>
+<Tip>
+
+Security for VMs can be managed by opening ports on a NSG.
+
+</Tip>
 ## Virtual Machine Disks
 
 ### What it is
@@ -2101,29 +2195,34 @@ Azure VM workloads with specific configurations and additional resources can pro
 
 To get the disk encryption status of a disk on a VM:
 
-```ps
+```powershell PowerShell
 Get-AzVMDiskEncryptionStatus -ResourceGroupname <name> -VMName <name>
 ```
 
 ### Key Takeaways
 
-> [!note]
->
-> Azure Disks = VHD
->
-> - OS Disk
-> - Temporary Disk
-> - Data Disk
->
-> The underlying datacenter disks are encrypted (SSE) and VHDs can also be encrypted (ADE).
+<Note>
 
+Azure Disks = VHD
+
+- OS Disk
+- Temporary Disk
+- Data Disk
+
+The underlying datacenter disks are encrypted (SSE) and VHDs can also be encrypted (ADE).
+
+</Note>
 ## Virtual Machine Availability and Scale Sets
 
 ### Global Infrastructure and High Availability
 
-![](high-availability.png)
+<Frame>
+  <img src="../images/high-availability.png" />
+</Frame>
 
-![](high-availability-2.png)
+<Frame>
+  <img src="../images/high-availability-2.png" />
+</Frame>
 
 ### Purpose of Availability Sets
 
@@ -2139,10 +2238,11 @@ Get-AzVMDiskEncryptionStatus -ResourceGroupname <name> -VMName <name>
 
 - Logical grouping of infrastructure for maintenance/updates. (Max UD: 20)
 
-> [!note]
->
-> Already existing VMs cannot be added to an Availability Set. They need to be added on creation.
+<Note>
 
+Already existing VMs cannot be added to an Availability Set. They need to be added on creation.
+
+</Note>
 ### Purpose of Scale Sets
 
 - Simplify scalings configurations.
@@ -2165,17 +2265,18 @@ Get-AzVMDiskEncryptionStatus -ResourceGroupname <name> -VMName <name>
 
 ### Key Takeaways
 
-> [!note]
->
-> **High Availability**
-> Design highly available solutions using zonal redundant deployments.
->
-> **Availability Sets**
-> Provide protection for redundant VMs by preventing outages related to faults and updates by logically grouping them into domains.
->
-> **Scale Sets**
-> Autoscale solutions to meet demands of traffic and scale in to decrease costs when demand goes down.
+<Note>
 
+**High Availability**
+Design highly available solutions using zonal redundant deployments.
+
+**Availability Sets**
+Provide protection for redundant VMs by preventing outages related to faults and updates by logically grouping them into domains.
+
+**Scale Sets**
+Autoscale solutions to meet demands of traffic and scale in to decrease costs when demand goes down.
+
+</Note>
 ## Automating Virtual Machine Deployments
 
 ### Why Automate
@@ -2247,17 +2348,18 @@ Resource: "Virtual Machine" {
 - Select the template.
 - Select `Deploy`.
 
-> [!tip]
->
-> You can export an ARM template from a VM under **Automation**.
+<Tip>
 
+You can export an ARM template from a VM under **Automation**.
+
+</Tip>
 Log in to a VM to deprovision it:
 
-```sh
+```bash Bash
 sudo waagent -deprovision+user
 ```
 
-```sh
+```bash Bash
 $rg = (Get-AzResourceGroup).ResourceGroupName
 $vm = az vm list --query [].name -o tsv
 
@@ -2266,13 +2368,13 @@ az vm deallocate --resource-group $rg --name $vm
 
 Generalize the VM:
 
-```sh
+```bash Bash
 az vm generalize --resource-group $rg --name $vm
 ```
 
 Create a VM image:
 
-```sh
+```bash Bash
 az image create --resource-group $rg --name <image-name> --source $vm
 ```
 
@@ -2283,33 +2385,34 @@ az image create --resource-group $rg --name <image-name> --source $vm
 
 ### Key Takeaways
 
-> [!note]
->
-> **ARM Templates**
-> Deploy VMs quickly and manage infrastructure using change control using Infrastructure as Code (IaC).
->
-> **VHD Template**
-> Create a golden image of VMs to easily deploy VMs with consistent software and configurations.
->
-> **Automate Management**
-> Manage VM deployments using custom data and manage VMs using extension scripts.
+<Note>
 
+**ARM Templates**
+Deploy VMs quickly and manage infrastructure using change control using Infrastructure as Code (IaC).
+
+**VHD Template**
+Create a golden image of VMs to easily deploy VMs with consistent software and configurations.
+
+**Automate Management**
+Manage VM deployments using custom data and manage VMs using extension scripts.
+
+</Note>
 ### Lab: Using Custom Images for a VM Scale Set
 
-```sh
+```bash Bash
 RG=$(az group list --query [].name --output tsv)
 VM=$(az vm list --query [].id --output tsv)
 ```
 
 Create an image gallery:
 
-```sh
+```bash Bash
 az sig create --resource-group $RG --location westus --gallery-name imageGallery
 ```
 
 Create an image definition:
 
-```sh
+```bash Bash
 az sig image-definition create \
 --resource-group $RG \
 --location westus \
@@ -2326,7 +2429,7 @@ az sig image-definition create \
 
 Create an image version:
 
-```sh
+```bash Bash
 az sig image-version create \
 --resource-group $RG \
 --location westus \
@@ -2339,13 +2442,13 @@ az sig image-version create \
 
 Get the image resource id:
 
-```sh
+```bash Bash
 IMAGE=$(az sig image-definition list --gallery-name imageGallery --resource-group $RG --query [].id --output tsv)
 ```
 
 Create a VM scale set:
 
-```sh
+```bash Bash
 az vmss create \
 --resource-group $RG \
 --name myVmss \
@@ -2370,7 +2473,9 @@ Manages system updates and patches for workloads both in the Azure cloud and on-
 
 ### Components
 
-![](update-management-components.png)
+<Frame>
+  <img src="../images/update-management-components.png" />
+</Frame>
 
 ### Enabling Update Management
 
@@ -2378,20 +2483,21 @@ On a VM > under **Operations** > **Guest + host updates**.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Automation Account**
-> Service for managing update configurations for VMs.
->
-> **Hybrid Runbook Worker**
-> Runbook for updates and configurations that will be run.
->
-> **Log Analytics Workspace**
-> Storage for logging details about update management processes.
->
-> **Log Analytics Agent**
-> Agent installed on OS for sending back data to workspace log.
+<Note>
 
+**Automation Account**
+Service for managing update configurations for VMs.
+
+**Hybrid Runbook Worker**
+Runbook for updates and configurations that will be run.
+
+**Log Analytics Workspace**
+Storage for logging details about update management processes.
+
+**Log Analytics Agent**
+Agent installed on OS for sending back data to workspace log.
+
+</Note>
 ## Automating Virtual Machine Configuration
 
 ### Describing Configuration Automation
@@ -2418,21 +2524,24 @@ Configuration MyDscConfiguration {
 
 ### Use Case
 
-![](dsc-use-case.png)
+<Frame>
+  <img src="../images/dsc-use-case.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Automation Account**
-> Service for managing update configurations for VMs.
->
-> **PowerShell DSC**
-> PowerShell scripts that declare desired state of VMs.
->
-> **Local Configuration Manager**
-> Sends current config state to pull server evaluation.
+<Note>
 
+**Automation Account**
+Service for managing update configurations for VMs.
+
+**PowerShell DSC**
+PowerShell scripts that declare desired state of VMs.
+
+**Local Configuration Manager**
+Sends current config state to pull server evaluation.
+
+</Note>
 ## Azure Bastion
 
 ### What It Is
@@ -2448,7 +2557,9 @@ Configuration MyDscConfiguration {
 
 ### Architecture
 
-![](bastion-architecture.png)
+<Frame>
+  <img src="../images/bastion-architecture.png" />
+</Frame>
 
 ### Implementation
 
@@ -2459,26 +2570,27 @@ Configuration MyDscConfiguration {
 
 ### Key Takeaways
 
-> [!note]
->
-> **Private Traffic**
-> Traffic from Bastion to target VM stays within VNets (peered included).
->
-> **Hardened Bastion**
-> NSGs are not needed because Bastion is hardened internally.
->
-> **Service Integration**
-> Bastion natively integrates with Azure Firewall.
->
-> **Concurrent Connections**
-> Total maximum connections is 25 with RDP and 50 with SSH traffic.
->
-> **Audit Logs**
-> Enable diagnostics for auditing Bastion connections.
->
-> **Required Role**
-> Reader role permissions are required on the Bastion, VM, and NIC in order to use Bastion.
+<Note>
 
+**Private Traffic**
+Traffic from Bastion to target VM stays within VNets (peered included).
+
+**Hardened Bastion**
+NSGs are not needed because Bastion is hardened internally.
+
+**Service Integration**
+Bastion natively integrates with Azure Firewall.
+
+**Concurrent Connections**
+Total maximum connections is 25 with RDP and 50 with SSH traffic.
+
+**Audit Logs**
+Enable diagnostics for auditing Bastion connections.
+
+**Required Role**
+Reader role permissions are required on the Bastion, VM, and NIC in order to use Bastion.
+
+</Note>
 # Chapter 11 - Network Traffic Management
 
 - [Azure Load Balancer](#azure-load-balancer)
@@ -2498,7 +2610,9 @@ A networking solution for distributing traffic between backend compute.
 
 ### Traditional vs Azure
 
-![](trad-vs-azure-lb.png)
+<Frame>
+  <img src="../images/trad-vs-azure-lb.png" />
+</Frame>
 
 ### Components
 
@@ -2520,26 +2634,27 @@ A networking solution for distributing traffic between backend compute.
 
 ### Key Takeaways
 
-> [!note]
->
-> **Load Balancing**
-> Balance traffic between external or internal solutions.
->
-> **Health Probing**
-> Health check ports for nodes in the backend pool.
->
-> **DNAT**
-> Port forward inbound traffic to nodes in the backend pool.
->
-> **SNAT**
-> Port forward outbound traffic from nodes in the backend pool.
->
-> **Availability Zones**
-> Determine availability zone selection for deployment.
+<Note>
 
+**Load Balancing**
+Balance traffic between external or internal solutions.
+
+**Health Probing**
+Health check ports for nodes in the backend pool.
+
+**DNAT**
+Port forward inbound traffic to nodes in the backend pool.
+
+**SNAT**
+Port forward outbound traffic from nodes in the backend pool.
+
+**Availability Zones**
+Determine availability zone selection for deployment.
+
+</Note>
 ### Lab: Create a Load Balancer
 
-```ps
+```powershell PowerShell
 $RG="resource-group-name"
 $LOC="region"
 $NSG="network-security-group-name"
@@ -2549,7 +2664,7 @@ $SNET="subnet-name"
 
 Create the network interface for the first VM:
 
-```ps
+```powershell PowerShell
 az network nic create `
 --resource-group $RG `
 --location $LOC `
@@ -2561,7 +2676,7 @@ az network nic create `
 
 Create the network interface for the second VM:
 
-```ps
+```powershell PowerShell
 az network nic create `
 --resource-group $RG `
 --location $LOC `
@@ -2573,7 +2688,7 @@ az network nic create `
 
 Create a `cloud-init` file to install packages:
 
-```ps
+```powershell PowerShell
 vim cloud-init.txt
 ```
 
@@ -2621,7 +2736,7 @@ runcmd:
 
 Create the first VM:
 
-```ps
+```powershell PowerShell
 az vm create `
 --resource-group $RG `
 --location $LOC `
@@ -2636,7 +2751,7 @@ az vm create `
 
 Create the second VM:
 
-```ps
+```powershell PowerShell
 az vm create `
 --resource-group $RG `
 --location $LOC `
@@ -2651,7 +2766,7 @@ az vm create `
 
 Create the load balancer's public IP address:
 
-```ps
+```powershell PowerShell
 az network public-ip create `
 --resource-group $RG `
 --location $LOC `
@@ -2661,7 +2776,7 @@ az network public-ip create `
 
 Create the load balancer:
 
-```ps
+```powershell PowerShell
 az network lb create `
 --resource-group $RG `
 --location $LOC `
@@ -2674,7 +2789,7 @@ az network lb create `
 
 Add a health probe to the load balancer:
 
-```ps
+```powershell PowerShell
 az network lb probe create `
 --resource-group $RG `
 --lb-name myLoadBalancer `
@@ -2685,7 +2800,7 @@ az network lb probe create `
 
 Create the load balancing rules:
 
-```ps
+```powershell PowerShell
 az network lb rule create `
 --resource-group $RG `
 --lb-name myLoadBalancer `
@@ -2701,7 +2816,7 @@ az network lb rule create `
 
 Add the first VM to the load balancer pool:
 
-```ps
+```powershell PowerShell
 az network nic ip-config address-pool add `
 --address-pool myBackEndPool `
 --ip-config-name ipconfig1 `
@@ -2712,7 +2827,7 @@ az network nic ip-config address-pool add `
 
 Add the second VM to the load balancer pool:
 
-```ps
+```powershell PowerShell
 az network nic ip-config address-pool add `
 --address-pool myBackEndPool `
 --ip-config-name ipconfig1 `
@@ -2723,7 +2838,7 @@ az network nic ip-config address-pool add `
 
 Get the public IP of the load balancer:
 
-```ps
+```powershell PowerShell
 az network public-ip show `
 --resource-group $RG `
 --name myPublicIP `
@@ -2744,7 +2859,9 @@ A networking service for load balancing between backend compute.
 
 ### Azure Load Balancer vs Application Gateway
 
-![](lb-vs-app-gw.png)
+<Frame>
+  <img src="../images/lb-vs-app-gw.png" />
+</Frame>
 
 ### Components
 
@@ -2764,29 +2881,31 @@ A networking service for load balancing between backend compute.
 
 - Load balancing rules, HTTP settings, and health probe.
 
-> [!tip]
->
-> The subnet for an Application Gateway has to be named `AppGatewaySubnet`.
+<Tip>
 
+The subnet for an Application Gateway has to be named `AppGatewaySubnet`.
+
+</Tip>
 ### Key Takeaways
 
-> [!note]
->
-> **Load Balancing**
-> Balance traffic between backend pools using HTTP/S.
->
-> **SSL Termination**
-> Terminate TLS/SSL at the application gateway.
->
-> **URL Routing**
-> URL path-based routing between multiple backend pools.
->
-> **Security**
-> Web Application Firewall security for the load balancing solution.
->
-> **Autoscaling**
-> Scale up/down the backend pools for the application gateway.
+<Note>
 
+**Load Balancing**
+Balance traffic between backend pools using HTTP/S.
+
+**SSL Termination**
+Terminate TLS/SSL at the application gateway.
+
+**URL Routing**
+URL path-based routing between multiple backend pools.
+
+**Security**
+Web Application Firewall security for the load balancing solution.
+
+**Autoscaling**
+Scale up/down the backend pools for the application gateway.
+
+</Note>
 # Chapter 12 - Web Apps and Containers
 
 - [App Service Plan](#app-service-plan)
@@ -2821,30 +2940,35 @@ Defines a set of compute resources for a web app to run on.
 - Manage patching and security.
 - Manage load balancing.
 
-![](trad-vs-app-service.png)
+<Frame>
+  <img src="../images/trad-vs-app-service.png" />
+</Frame>
 
 - Managed infrastructure.
 - High availability.
 - Scalability.
 
-![](trad-vs-app-service-2.png)
+<Frame>
+  <img src="../images/trad-vs-app-service-2.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **App Service Plans**
-> A plan that defines the compute resources and available features for a web app.
->
-> **App Service Plan Compute Resources**
-> Pricing tier, size of VM instances, number of VM instances, and region.
->
-> **App Service Plan Compute Types**
-> Shared, dedicated, and isolated. Each provides a different level of compute isolation, network isolation, and features like scaling.
->
-> **App Service Plans and Web Apps**
-> Provides PaaS to configure and host applications, rather than managing infrastructure. You just manage a few configuration details and your code.
+<Note>
 
+**App Service Plans**
+A plan that defines the compute resources and available features for a web app.
+
+**App Service Plan Compute Resources**
+Pricing tier, size of VM instances, number of VM instances, and region.
+
+**App Service Plan Compute Types**
+Shared, dedicated, and isolated. Each provides a different level of compute isolation, network isolation, and features like scaling.
+
+**App Service Plans and Web Apps**
+Provides PaaS to configure and host applications, rather than managing infrastructure. You just manage a few configuration details and your code.
+
+</Note>
 ## Creating Web Apps
 
 ### Features
@@ -2869,38 +2993,40 @@ Integrates several Azure services, such as Azure AD as an identity provider or V
 
 ### Architecture
 
-![](web-app-architecture.png)
+<Frame>
+  <img src="../images/web-app-architecture.png" />
+</Frame>
 
 ### Demo: Deploy .NET App
 
-```ps
+```powershell PowerShell
 $rg = (get-AzResourceGroup).ResourceGroupName
 $appname = "<name>"
 ```
 
 Create a dotnet app:
 
-```ps
+```powershell PowerShell
 dotnet new mvc -o <web-app-name>
 ```
 
 Publish the app:
 
-```ps
+```powershell PowerShell
 cd <web-app-name>
 dotnet publish -o pub
 ```
 
 Zip the files:
 
-```ps
+```powershell PowerShell
 cd pub
 zip -r site.zip *
 ```
 
 Deploy the app:
 
-```ps
+```powershell PowerShell
 az webapp deployment source config-zip `
 --src site.zip `
 --resource-group $rg `
@@ -2909,20 +3035,21 @@ az webapp deployment source config-zip `
 
 ### Key Takeaways
 
-> [!note]
->
-> **Application Runtime**
-> Host an app using a specific runtime that is selected as part of the provisioning process.
->
-> **Public Accessiblity**
-> Web Apps are publicly accessible by default, and can be accessed using the domain provided by Azure.
->
-> **Publishing Tools**
-> Publish your app code to web apps using various publishing tools including Azure DevOps, GitHub, Zip file, SCM, etc.
->
-> **Database Support**
-> Connect your database to your web app using a connection string.
+<Note>
 
+**Application Runtime**
+Host an app using a specific runtime that is selected as part of the provisioning process.
+
+**Public Accessiblity**
+Web Apps are publicly accessible by default, and can be accessed using the domain provided by Azure.
+
+**Publishing Tools**
+Publish your app code to web apps using various publishing tools including Azure DevOps, GitHub, Zip file, SCM, etc.
+
+**Database Support**
+Connect your database to your web app using a connection string.
+
+</Note>
 ## Configuring Web Apps
 
 ### Configuration Options
@@ -2933,44 +3060,55 @@ Integrate with other identity providers - Facebook, Google, Twitter.
 **Custom Domain**
 Provide a custom domain to be used by the web application.
 
-![](web-app-custom-domain.png)
+<Frame>
+  <img src="../images/web-app-custom-domain.png" />
+</Frame>
 
 **Scaling**
 Specify scaling options to scale up/scale out compute resources for your web apps.
 
-![](web-app-scaling.png)
+<Frame>
+  <img src="../images/web-app-scaling.png" />
+</Frame>
 
 **Deployment**
 Deploy apps using DevOps strategies like deployment slots for a staging slot and a production slot.
 
-![](web-app-deployment-slots.png)
+<Frame>
+  <img src="../images/web-app-deployment-slots.png" />
+</Frame>
 
 **Network**
 Manage network settings and integration by doing things such as connecting web apps with VNets, CDN, etc.
 
-![](web-app-networking.png)
+<Frame>
+  <img src="../images/web-app-networking.png" />
+</Frame>
 
 **Backup**
 Back up web apps using full archival backups or incremental snapshots that are stored in a storage account via the Blob Storage Service.
 
-![](web-app-backup.png)
+<Frame>
+  <img src="../images/web-app-backup.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Scaling**
-> Limited by pricing tier and compute type.
->
-> **Deployment**
-> Used for staging apps for a swap.
->
-> **Network**
-> Web App is public by default, and can be deployed into or integrated with a VNet.
->
-> **Backup**
-> Blob backups of app configs, file content, and database connections.
+<Note>
 
+**Scaling**
+Limited by pricing tier and compute type.
+
+**Deployment**
+Used for staging apps for a swap.
+
+**Network**
+Web App is public by default, and can be deployed into or integrated with a VNet.
+
+**Backup**
+Blob backups of app configs, file content, and database connections.
+
+</Note>
 ## Describing Containers
 
 ### Description
@@ -2978,7 +3116,9 @@ Back up web apps using full archival backups or incremental snapshots that are s
 **Container**
 A unit of software. This unit consists of code, its dependencies, and configurations to be shipped and run anywhere.
 
-![](azure-containers.png)
+<Frame>
+  <img src="../images/azure-containers.png" />
+</Frame>
 
 ### Components
 
@@ -3015,47 +3155,48 @@ COPY ./index.html ./
 
 Build the image:
 
-```sh
+```bash Bash
 docker build --tag <name> .
 ```
 
 Run the container:
 
-```sh
+```bash Bash
 docker run -p 1234:80 <name>
 ```
 
 Login to the Azure Container Registry (credentials under Settings > Access keys):
 
-```sh
+```bash Bash
 docker login <registry-name>.azurecr.io --username <username>
 ```
 
 Tag the image:
 
-```sh
+```bash Bash
 docker tag <name> <registry-name>.azurecr.io/<repo-name>/<name>:latest
 ```
 
 Push to the registry:
 
-```sh
+```bash Bash
 docker push <registry-name>azurecr.io/<repo-name>/<name>:latest
 ```
 
 ### Key Takeaways
 
-> [!note]
->
-> **Development**
-> Create and build a container so it can be shipped.
->
-> **Registry**
-> Manage a container registry (repository) of container images in a single place.
->
-> **Host**
-> Host a container image as an instance of a container on a hosting service.
+<Note>
 
+**Development**
+Create and build a container so it can be shipped.
+
+**Registry**
+Manage a container registry (repository) of container images in a single place.
+
+**Host**
+Host a container image as an instance of a container on a hosting service.
+
+</Note>
 ## Azure Container Instances
 
 ### Description
@@ -3084,7 +3225,7 @@ Update the container group with a FQDN.
 **Deploy a Multi-Container Solution**
 Using a JSON/YAML file to create a multi-container container group.
 
-```ps
+```powershell PowerShell
 az deployment group create `
 --resource-group (Get-AzResourceGroup).ResourceGroupName `
 --template-file <name>.json
@@ -3092,26 +3233,27 @@ az deployment group create `
 
 ### Key Takeaways
 
-> [!note]
->
-> **Scaling/Sizing**
-> No autoscaling options available, manual redeployment of a container group is required. You determine CPU, memory, and GPU.
->
-> **Container Groups**
-> A top-level resources in ACI. A collection of containers that are on the same host machine and share a lifecycle and resources.
->
-> **Networking**
-> A container group shares an IP address and fully qualified domain name (FQDN). Ports must be opened for external access. Localhost connectivity by default within the group. Can deploy as public, private, or none.
->
-> **Storage**
-> Persistent storage is available by mounting a storage volume. For example, an Azure file share in Azure Files.
->
-> **Restart Policy**
-> Restart of containers is available using policies: `Always`, `Never`, and `OnFailure`.
->
-> **Environment Variables**
-> Save plaintext and secure environment variables to be used by a container. For example, a database connection string.
+<Note>
 
+**Scaling/Sizing**
+No autoscaling options available, manual redeployment of a container group is required. You determine CPU, memory, and GPU.
+
+**Container Groups**
+A top-level resources in ACI. A collection of containers that are on the same host machine and share a lifecycle and resources.
+
+**Networking**
+A container group shares an IP address and fully qualified domain name (FQDN). Ports must be opened for external access. Localhost connectivity by default within the group. Can deploy as public, private, or none.
+
+**Storage**
+Persistent storage is available by mounting a storage volume. For example, an Azure file share in Azure Files.
+
+**Restart Policy**
+Restart of containers is available using policies: `Always`, `Never`, and `OnFailure`.
+
+**Environment Variables**
+Save plaintext and secure environment variables to be used by a container. For example, a database connection string.
+
+</Note>
 ## Azure Kubernetes Service
 
 ### Traditional Azure Container Instance (ACI)
@@ -3155,17 +3297,20 @@ Implement storage volumes that are either static or dynamic.
 **Registry**
 Store container images in Azure Container Registry, Docker Hub, or other public/private repos. Docker images are supported.
 
-> [!tip]
->
-> To retrieve access credentials:
+<Tip>
 
-```sh
+To retrieve access credentials:
+
+</Tip>
+```bash Bash
 az aks get-credentials --name <name> --resource-group <name>
 ```
 
 ### Architecture
 
-![](aks-architecture.png)
+<Frame>
+  <img src="../images/aks-architecture.png" />
+</Frame>
 
 # Chapter 13 - Monitoring
 
@@ -3189,7 +3334,9 @@ Captures metrics and logs on monitored resources.
 - Monitor platform services
 - Monitor application code
 
-![](monitoring.png)
+<Frame>
+  <img src="../images/monitoring.png" />
+</Frame>
 
 ### Metrics vs Logs
 
@@ -3203,35 +3350,38 @@ Captures metrics and logs on monitored resources.
 
 ### Monitoring Explained
 
-![](monitoring-explained.png)
+<Frame>
+  <img src="../images/monitoring-explained.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Metrics**
-> Metrics are gathered on a per-resource basis.
-> How to use metrics?
->
-> - View metrics in Metrics Explorer.
-> - Query in Log Analytics.
-> - Alert and take action.
-> - Export and archive.
->
-> **Logs**
-> Logs are not gathered by default by Azure.
-> How to use logs?
->
-> - Query in Log Analytics.
-> - Archive.
-> - Stream to third party.
->
-> **Diagnostic Settings**
-> Define how and where metrics and logs will be stored on a per-resource basis.
->
-> - OS-level data.
-> - App-level data.
+<Note>
 
+**Metrics**
+Metrics are gathered on a per-resource basis.
+How to use metrics?
+
+- View metrics in Metrics Explorer.
+- Query in Log Analytics.
+- Alert and take action.
+- Export and archive.
+
+**Logs**
+Logs are not gathered by default by Azure.
+How to use logs?
+
+- Query in Log Analytics.
+- Archive.
+- Stream to third party.
+
+**Diagnostic Settings**
+Define how and where metrics and logs will be stored on a per-resource basis.
+
+- OS-level data.
+- App-level data.
+
+</Note>
 ## Setting Up Alerts and Actions
 
 ### Describing Azure Monitor Alerts
@@ -3244,12 +3394,15 @@ Metric, activity, and log signals.
 **Action Group**
 The actions that will take place when an alert has been triggered.
 
-![](action-groups.png)
+<Frame>
+  <img src="../images/action-groups.png" />
+</Frame>
 
-> [!tip]
->
-> An Action Group action could start an Automation Runbook - restart a VM.
+<Tip>
 
+An Action Group action could start an Automation Runbook - restart a VM.
+
+</Tip>
 ## Azure Monitor Logs
 
 ### Description
@@ -3265,18 +3418,21 @@ On-premises resources in hybrid environments.
 
 ### Components
 
-![](log-analytics-components.png)
+<Frame>
+  <img src="../images/log-analytics-components.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Log Analytics Agent**
-> An extension installed on resource to allow for telemetry to be gathered into the workspace.
->
-> **Azure Performance Diagnostics VM Extension for Windows**
-> Azure Performance Diagnostics VM Extension for Windows is an agent in Azure Monitor that collects monitoring data from the guest operating system and workloads of Azure virtual machines and other compute resources.
+<Note>
 
+**Log Analytics Agent**
+An extension installed on resource to allow for telemetry to be gathered into the workspace.
+
+**Azure Performance Diagnostics VM Extension for Windows**
+Azure Performance Diagnostics VM Extension for Windows is an agent in Azure Monitor that collects monitoring data from the guest operating system and workloads of Azure virtual machines and other compute resources.
+
+</Note>
 ## Monitor Insights
 
 ### Description
@@ -3322,20 +3478,21 @@ Monitoring service specific to application code.
 
 ### Key Takeaways
 
-> [!note]
->
-> **VM Insights**
-> Virtual machine and VMSS-specific monitoring service.
->
-> **Network Insights**
-> Virtual network-specific monitoring service.
->
-> **Container Insights**
-> Container or AKS-specific monitoring service.
->
-> **Application Insights**
-> Application code-specific monitoring service.
+<Note>
 
+**VM Insights**
+Virtual machine and VMSS-specific monitoring service.
+
+**Network Insights**
+Virtual network-specific monitoring service.
+
+**Container Insights**
+Container or AKS-specific monitoring service.
+
+**Application Insights**
+Application code-specific monitoring service.
+
+</Note>
 ## Application Insights
 
 ### Description
@@ -3365,21 +3522,24 @@ Analyze user metrics from client-side events like user interaction.
 
 ### Components
 
-![](app-insights-components.png)
+<Frame>
+  <img src="../images/app-insights-components.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Runtime Instrumentation**
-> Code-less approach with Application Insights, no package implementation.
->
-> **Build-Time Instrumentation**
-> Code approach with Application Insights, package implemented via SDK.
->
-> **Instrumentation Key**
-> Key for implementing instrumentation in applications. Stored in Application Insights resource.
+<Note>
 
+**Runtime Instrumentation**
+Code-less approach with Application Insights, no package implementation.
+
+**Build-Time Instrumentation**
+Code approach with Application Insights, package implemented via SDK.
+
+**Instrumentation Key**
+Key for implementing instrumentation in applications. Stored in Application Insights resource.
+
+</Note>
 ## Network Watcher
 
 ### Description
@@ -3423,7 +3583,9 @@ The process of recovering from a disaster, such as a datacenter power outage. Ev
 
 ### RPO vs RTO
 
-![](rpo-vs-rto.png)
+<Frame>
+  <img src="../images/rpo-vs-rto.png" />
+</Frame>
 
 ### Methods
 
@@ -3452,26 +3614,29 @@ Supported workloads:
 
 ### Components
 
-![](azure-backup-components.png)
+<Frame>
+  <img src="../images/azure-backup-components.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Workload**
->
-> - Azure VMs
-> - On-premises VMs
-> - SQL Server workloads
-> - SAP HANA workloads
->
-> **Recovery Services Vault**
-> Storage management service for all backup data.
->
-> **Azure Backup**
-> Cloud-managed backup service for configured backup frequency
-> and retention.
+<Note>
 
+**Workload**
+
+- Azure VMs
+- On-premises VMs
+- SQL Server workloads
+- SAP HANA workloads
+
+**Recovery Services Vault**
+Storage management service for all backup data.
+
+**Azure Backup**
+Cloud-managed backup service for configured backup frequency
+and retention.
+
+</Note>
 ## Azure Site Recovery
 
 ### Description
@@ -3484,21 +3649,24 @@ Requires an Azure Recovery Services vault.
 
 ### Components
 
-![](azure-site-recovery-components.png)
+<Frame>
+  <img src="../images/azure-site-recovery-components.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Replicated Items**
-> The workload that will be replicated site-to-site by Azure Site Recovery
->
-> **Replication Policy**
-> Defines the frequency of snapshots and retention period of recovery points. Can be app-consistent or crash-consistent.
->
-> **Recovery Plan**
-> Automate and run test failover events with protected items and pre- and/or post-scripts.
+<Note>
 
+**Replicated Items**
+The workload that will be replicated site-to-site by Azure Site Recovery
+
+**Replication Policy**
+Defines the frequency of snapshots and retention period of recovery points. Can be app-consistent or crash-consistent.
+
+**Recovery Plan**
+Automate and run test failover events with protected items and pre- and/or post-scripts.
+
+</Note>
 ## Backup Reports
 
 ### Description
@@ -3512,15 +3680,19 @@ Uses Log Analytics as its logging service.
 
 ### Components
 
-![](backup-reports-components.png)
+<Frame>
+  <img src="../images/backup-reports-components.png" />
+</Frame>
 
 ### Key Takeaways
 
-> [!note]
->
-> **Backup Reports**
->
-> - View backup policies.
-> - View backup jobs.
-> - View backup items.
-> - View summary of estate.
+<Note>
+
+**Backup Reports**
+
+- View backup policies.
+- View backup jobs.
+- View backup items.
+- View summary of estate.
+
+</Note>

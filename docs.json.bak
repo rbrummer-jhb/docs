@@ -15,7 +15,11 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["introduction", "quickstart", "development"]
+            "pages": [
+              "introduction",
+              "quickstart",
+              "development"
+            ]
           },
           {
             "group": "Essentials",
@@ -35,7 +39,9 @@
         "groups": [
           {
             "group": "API Documentation",
-            "pages": ["api-reference/introduction"]
+            "pages": [
+              "api-reference/introduction"
+            ]
           },
           {
             "group": "Endpoint Examples",
@@ -53,34 +59,17 @@
         "groups": [
           {
             "group": "Study Material",
-            "pages": ["microsoft/learning-paths", "microsoft/courses"]
+            "pages": [
+              "microsoft/learning-paths",
+              "microsoft/courses"
+            ]
           },
           {
             "group": "Azure DevOps",
             "pages": [
               "microsoft/az-900-microsoft-azure-fundamentals",
-              "microsoft/azure-powershell-essentials",
-              "microsoft/az-104-microsoft-azure-administrator",
-              "microsoft/build-and-deploy-azure-templates",
-              "microsoft/az-204-developing-solutions-for-microsoft-azure",
-              "microsoft/beginner-guide-to-containers-and-orchestration",
-              "microsoft/az-400-designing-and-implementing-microsoft-devops-solutions",
-              "microsoft/hashicorp-packer",
-              "microsoft/az-305-designing-microsoft-azure-infrastructure-solutions"
+              "microsoft/az-104-microsoft-azure-administrator"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "AWS",
-        "groups": [
-          {
-            "group": "Study Material",
-            "pages": ["aws/learning-paths", "aws/courses"]
-          },
-          {
-            "group": "AWS DevOps",
-            "pages": ["aws/saa-c03-aws-certified-solutions-architect-assoicate"]
           }
         ]
       }
