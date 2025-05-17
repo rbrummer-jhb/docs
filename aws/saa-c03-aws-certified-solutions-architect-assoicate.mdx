@@ -454,7 +454,7 @@ Why is it dangerous to use the AWS root user account?
 - [Lab: Set Up Cross-Region Bucket Replication](#lab-set-up-cross-region-bucket-replication)
 - [Lab: Creating a Static Website Using S3](#lab-creating-a-static-website-with-s3)
 - [Lab: Creating S3 Buckets, Managing Objects, and Enabling Versioning](#lab-creating-s3-buckets-managing-objects-and-enabling-versioning)
-- [Quiz; Simple Storage Service S3](#quiz-simple-storage-service-s3)
+- [Quiz: Simple Storage Service S3](#quiz-simple-storage-service-s3)
 
 ## S3 Overview
 
@@ -1110,3 +1110,683 @@ Delete markers are **not replicated by default**.
 - Click **Save changes**.
 - Refresh the browser tab with the static website (the endpoint URL you opened earlier). This time, the site should load correctly.
 - Add a `/` at the end of the URL and some random letters (anything that's knowingly an error). This will display your `error.html` page.
+
+## Lab: Creating S3 Buckets, Managing Objects, and Enabling Versioning
+
+### Create a Public and Private Amazon S3 Bucket
+
+**Create a Public Bucket**
+
+- Navigate to S3.
+- Click **Create bucket**.
+- Set the following values:
+  - **Bucket name**: Enter `acg-testlab-public-<random>`, where `<random>` is a random string of characters to make the bucket name globally unique (e.g., `acg-testlab-4324yr-public`).
+  - **Region**: Select **US East (N. Virginia) us-east-1**.
+  - **Object Ownership**: Select **ACLs enabled** and **Bucket owner preferred**.
+- In the **Block Public Access settings for this bucket** section, uncheck the box for **Block all public access**.
+- Check the box stating **I acknowledge that the current settings might result in this bucket and the objects within becoming public** to confirm that we understand the bucket is going to be public
+- Leave the rest of the settings as their defaults.
+- Click **Create bucket**.
+
+**Create a Private Bucket**
+
+- On the **Buckets** screen, click **Create bucket**.
+- Set the following values:
+  - **Bucket name**: Enter `acg-testlab-private-<random>`, where `<random>` is a random string of characters to make the bucket name globally unique (you can use the same string from your public bucket).
+  - **Region**: Select **US East (N. Virginia) us-east-1**.
+- Leave the rest of the settings as their defaults.
+- Click **Create bucket**.
+
+**Upload a File in the Private Bucket**
+
+- Select the private bucket name to open it.
+- In the **Objects** section, click **Upload**.
+- Click **Add files**.
+- Navigate to the files you downloaded for the lab, and upload the `cat1.jpg` image.
+- Leave the rest of the settings on the page as their defaults.
+- Click **Upload**.
+- After the file uploads successfully, click its name to view its properties.
+- Open the **Object URL** in a new browser tab. Since it's a private bucket, you'll see an error message.
+- Back on the `cat1.jpg` page, select the **Object actions** dropdown.
+- Note that the **Make public using ACL** option is grayed out, because the bucket is private and we set the ownership to not use ACLs.
+
+**Upload a File in the Public Bucket**
+
+- Click **Buckets** in the link trail at the top.
+- Select the public bucket name to open it.
+- In the **Objects** section, click **Upload**.
+- Click **Add files**.
+- Navigate to the files you downloaded for the lab, and upload the `cat1.jpg` image.
+- Leave the rest of the settings on the page as their defaults.
+- Click **Upload**.
+- After the file uploads successfully, click its name to view its properties.
+- Open the **Object URL** in a new browser tab. You should receive an error message because although the bucket is public, the object is not.
+- Back on the `cat1.jpg` page, select **Object actions** > **Make public using ACL**.
+- Click **Make public**.
+- Open the **Object URL** in a new browser tab again. This time, the image should load.
+
+### Enable Versioning on the Public Bucket and Validate Access to Different Versions of Files with the Same Name
+
+**Enable Versioning**
+
+- Back on the public bucket page, click the **Properties** tab.
+- In the **Bucket Versioning** section, click **Edit**.
+- Click **Enable** to enable bucket versioning.
+- Click **Save changes**.
+
+**Upload another Image to Test Versioning**
+
+- Click the **Objects** tab.
+- Click **Upload**, and then click **Add files**.
+- Rename `cat2.jpg` to `cat1.jpg` (this way, you'll upload a different image than the original `cat1.jpg` image).
+- Upload the newly renamed `cat1.jpg` image.
+- Click **Upload**.
+- After the file uploads successfully, click its name to view its properties.
+- Click the **Versions** tab. You should see there are two versions of the `cat1.jpg` file.
+
+**View the Image Versions**
+
+- Select **Object actions** > **Make public using ACL**.
+- Click **Make public**.
+- Click the **Properties** tab.
+- Open the **Object URL** in a new browser tab. This time, you should see the new image.
+- Back on the `cat1.jpg` page, click the **Versions** tab.
+- Click the **null** object.
+- Open its **Object URL** in a new browser tab. You should see the original `cat1.jpg` image you uploaded.
+
+## Quiz: Simple Storage Service S3
+
+<Note>
+Which of the following statements is true?
+
+**Bucket names must be unique across all AWS accounts in all the AWS Regions within the scope of each of AWS's partitions.**
+
+How does availability and durability differ in S3?
+
+**Availability is the ability to access your data, while durability is the ability of AWS to ensure your data is properly stored in S3.**
+
+Which of the following statements is true?
+
+**You can increase your Amazon S3 read or write performance by creating more prefixes in a bucket and parallelizing reads/writes.**
+
+What is the largest object you can store in S3?
+
+**5 TB**
+
+Since S3 is an object-based storage solution, which type of file should never be stored in it?
+
+**Operating system's boot files**
+
+</Note>
+
+# Chapter 5 - Elastic Cloud Compute EC2
+
+- [Overview](#overview)
+- [AWS Command Line](#aws-command-line)
+- [Using Roles](#using-roles)
+- [Security Groups and Bootstrap Scripts](#security-groups-and-bootstrap-scripts)
+- [EC2 Metadata and User Data](#ec2-metadata-and-user-data)
+- [Networking with EC2](#networking-with-ec2)
+- [Optimizing with EC2 Placement Groups](#optimizing-with-ec2-placement-groups)
+- [Solving Licensing Issues with Dedicated Hosts](#solving-licensing-issues-with-dedicated-hosts)
+- [Timing Workloads with Spot Instances and Spot Fleets](#timing-workloads-with-spot-instances-and-spot-fleet)
+- [Deploying vCenter in AWS with VMWare Cloud on AWS](#deploying-vcenter-in-aws-with-vmware-cloud-on-aws)
+- [Extending AWS Beyond the Cloud with AWS Outposts](#extending-aws-beyond-the-cloud-with-aws-outposts)
+- [Lab: EC2 Instance Bootstrapping](#lab-ec2-instance-bootstrapping)
+- [Lab: EC2 Roles and Instance Profiles in AWS](#lab-ec2-roles-and-instance-profiles-in-aws)
+- [Quiz: Elastic Cloud Compute EC2](#quiz-elastic-cloud-compute-ec2)
+
+## Overview
+
+### Introduction
+
+**Secure, resizable compute capacity in the cloud.**
+
+- Like a VM, only hosted in AWS instead of your own data center.
+- Designed to make web-scale cloud computing easier for developers.
+- The capacity you want when you need it.
+
+**Game Changer**
+
+- AWS led a big change in the industry by introducing EC2.
+
+**Pay Only for What You Use**
+
+- EC2 changed the economics of computing.
+
+**No Wasted Capacity**
+
+- Select the capacity you need right now. Grow and shrink when you need.
+
+**On-Premises Infrastructure**
+
+- Estimate capacity.
+- Long-term investment, 3-5 years.
+- Several days to provision extra capacity.
+
+### EC2 Pricing Options
+
+**On-Demand:** Pay by the hour or the second, depending on the type of instance you run.
+
+- **Flexible:** low cost and flexibility of Amazon EC2 without any upfront payment of long-term commitment.
+- **Short-Term:** apps with short-term, spiky, or unpredictable workloads that cannot be interrupted.
+- **Testing the Water:** apps being developed or tested on Amazon EC2 for the first time.
+
+**Reserved:** Reserved capacity for 1 or 3 years. Up to 72% discount on the hourly charge.
+
+- **Predictable Usage:** apps with steady state or predictable usage.
+- **Specific Capacity Requirements:** apps that require reserved capacity.
+- **Pay Up Front:** you can make upfront payments to reduce the total computing costs even further.
+- **Standard RIs:** up to 72% off the on-demand price.
+- **Convertible RIs:** up to 54% off the on-demand price. Has the option to change to a different RI type of equal or greater value.
+- **Scheduled RIs:** Launch within the time window you define. Match your capacity reservation to a predictable recurring schedule that only requires a fraction of a day, week, or month.
+
+**Spot:** Purchase unused capacity at a discount of up to 90%. Prices fluctuate with supply and demand.
+
+- **Flexible:** apps that flexible start and end times.
+- **Cost Sensitive:** apps that are only feasible at very low compute prices.
+- **Urgent Capacity:** users with an urgent need for large amounts of additional computing capacity.
+- When to use:
+  - Image rendering
+  - Genomic sequencing
+  - Algorithmic trading engines
+
+**Dedicated:** A physical EC2 server dedicated for your use. The most expensive option.
+
+- **Compliance:** regulatory requirements that may not support multi-tenant virtualization.
+- **Licensing:** great for licensing that does not support multi-tenancy or cloud deployments.
+- **On-Demand:** can be purchased on-demand (hourly).
+- **Reserved:** can be purchased as a reservation for up to 70% off the on-demand price.
+
+### Savings Plans with Reserved Instances
+
+**Save up to 72%**
+
+- All AWS compute usage, regardless of instance type or region.
+
+**Commit to 1 or 3 Years**
+
+- Commit to use a specific amount of compute power (measured by the hour) for a 1-year or 3-year period.
+
+**Super Flexible**
+
+- Not only EC2, this also includes serverless technologies like Lambda and Fargate.
+
+### Exam Tips
+
+<Note>
+  EC2 is like a VM, hosted in AWS instead of your own data center. Select the
+  capacity you need right now. Grow and shrink when you need.  
+  Pay for what you use.  
+  Wait minutes, not months.
+
+**On-Demand**  
+Pay by the hour or the second, depending on the type of instance you run. Great for flexiblity.
+
+**Reserved**  
+Reserved capacity for 1 or 3 years. Up to 72% discount on the hourly charge. Great if you have known, fixed requirements.
+
+**Spot**  
+Purchase unused capacity at a discount of up to 90%. Prices fluctuate with supply and demand. Great for apps with flexible start and end times.
+
+**Dedicated**  
+A physical EC2 server dedicated for your use. Great if you have server-bound licenses to reuse or compliance requirements.
+
+</Note>
+
+## AWS Command Line
+
+### The AWS Management Console
+
+The Graphical User Interface (GUI) that can interact with AWS.
+
+### Command Line Interactions
+
+You can also **interact with AWS** using the Command Line.
+
+### Lesson Objectives
+
+- **Launch an EC2 Instance** - using the AWS CLI.
+- **Create an IAM User** - give the user permissions to access and create S3 resources.
+- **Configure the AWS CLI** - configure the CLI using the IAM user's credentials. Use the CLI to create an S3 bucket and upload a file.
+
+### AWS CLI
+
+**Create an IAM User**
+
+- Under **IAM**, select **User groups**.
+- Select **Create Group**.
+- Add a **User group name**.
+- Under **Attach permissions policies - _Optional_**, search for `s3`.
+- Check the box for `AmazonS3FullAccess`.
+- Select **Create group**.
+- Under **IAM**, select **Users**.
+- Select **Create user**.
+- Add a **User name**.
+- Select **Next**.
+- Check the box for **Add user to group**.
+- Under **User groups**, select the new group.
+- Select **Next**.
+- Select **Create user**.
+- Select the new user.
+- Select the **Security Credentials**.
+- Under **Access keys**, select **Create access keys**.
+- Select **Command Line Interface (CLI)**.
+- Check the box for **I understand the above recommendation and want to proceed to create an access key**.
+- Select **Next**.
+- Select **Create access key**.
+- Copy the **Access key**.
+- Copy the **Secret access key**.
+
+**Configure the AWS CLI**
+
+- Elevate your privileges:
+
+```sh
+sudo su
+```
+
+- Configure the AWS profile:
+
+```sh
+aws configure
+```
+
+- Paste the **Access key**.
+- Paste the **Secret access keys**.
+- Optionally enter a `region name`.
+- Optionally enter an `output format`.
+
+- List S3 buckets:
+
+```sh
+aws s3 ls
+```
+
+- "Make" a bucket:
+
+```sh
+aws s3 mb s3://<name>
+```
+
+### Exam Tips
+
+<Note>
+**Least Privilege**  
+Always give your users the **minimum amount** of access required to do their job.
+
+**Use Groups**  
+**Create IAM groups** and assign users to groups. Group permissions are assigned using IAM policy documents. Your users will **automatically inherit** the permissions of the group.
+
+**Secret Access Key**  
+You will only see this once! If you lose it, you can delete the access key ID and secret access key and regenerate them. You will need to run `aws configure` again.
+
+**Don't Share Key Pairs**  
+Each developer should have their own access key ID and secret access key. Just like passwords, they should not be shared.
+
+**Supports Linux, Windows, MacOS**  
+You can install the CLI on your Mac, Linux, or Windows PC. You can also use it on EC2 instances.
+
+</Note>
+
+## Using Roles
+
+### What is an IAM Role
+
+A role is an identity you can create in IAM that has specific permissions. A role is similar to a user, as it is an AWS identity with permission policies that determine what the identity can and cannot do in AWS.
+
+However, instead of being uniquely associated with one person, a role is intended to be assumable by anyone who needs it.
+
+### Roles are Temporary
+
+A role does not have standard long-term credentials the same way passwords or access keys do. Instead, when you assume a role, it provides you with temporary security credentials for your role session.
+
+### What Else Can Roles Do
+
+Roles can be assumed by people, AWS architecture, or other system-level accounts.
+
+Roles can allow cross-account access. This allows one AWS account the ability to interact with resources in other AWS accounts.
+
+### Exam Tips
+
+<Note>
+**The Preferred Option**  
+Roles are preferred from a security perspective.
+
+**Avoid Hard-Coding Your Credentials**  
+Roles allow you to provide access without the use of access key IDs and secret access keys.
+
+**Policies**  
+Policies control a role's permissions.
+
+**Updates**  
+You can update a policy attached to a role, and it will take immediate effect.
+
+**Attaching and Detaching**  
+You can attach and detach roles to running EC2 instances without having to stop or terminate those instances.
+
+</Note>
+
+## Security Groups and Bootstrap Scripts
+
+### How Humans Sense Things
+
+**Light**  
+We see light using our **eyes**.
+
+**Sound**  
+We hear sound using our **ears**.
+
+**Heat**  
+We feel heat using our **skin**.
+
+### How Computers Communicate
+
+- **Linux** - SSH - Port `22`.
+- **Windows** - RDP - Port `3389`.
+- **HTTP** - Web Browsing - Port `80`.
+- **HTTPS** - Encrypted Web Browsing (SSL) - Port `443`.
+
+### Security Groups
+
+Security groups are **virtual firewalls for your EC2 instance.** By default, everything is blocked.
+
+<Tip>To let everything in: `0.0.0.0/0`.</Tip>
+
+In order to be able to **communicate to your EC2 instances via SSH/RDP/HTTP**, you will need to **open the correct ports**.
+
+### Bootstrap Scripts
+
+Scripts that run when the instance first starts.
+
+```sh
+#!/bin/bash
+
+yum update -y
+# installs apache
+yum install httpd -y
+# starts apache
+yum service httpd start
+cd /var/www/html
+echo "<html><body><h1>Hello World</h1></body></html>" > index.html
+```
+
+Adding these tasks at boot time **adds to the amount of time it takes to boot the instance**. However, it allows you to **automate the installation** of apps.
+
+### Exam Tips
+
+<Note>
+Changes to security groups take effect immediately.
+
+You can have any number of EC2 instances within a security group.
+
+You can have multiple security groups attached to EC2 instances.
+
+All inbound traffic is blocked by default.
+
+All outbound traffic is allowed.
+
+A bootstrap script is **a script that runs when the instance first runs.** It passes user data to the EC2 instance and can be used to install apps (like web servers and databases), as well as do updates and more.
+
+</Note>
+
+## EC2 Metadata and User Data
+
+### What is EC2 Metadata
+
+It is simply data about your EC2 instance.
+
+- This can include information such as private IP addresses, public IP address, hostname, security groups, etc.
+
+### Retrieving Metadata
+
+Using the `curl` command, we can query metadata about our EC2 instance.
+
+```sh
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
+&& curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/
+ami-id
+ami-launch-index
+ami-manifest-path
+block-device-mapping/
+events/
+hibernation/
+hostname
+identity-credentials/
+instance-action
+instance-id
+instance-life-cycle
+instance-type
+local-hostname
+local-ipv4
+mac
+managed-ssh-keys/
+metrics/
+network/
+placement/
+profile
+public-hostname
+public-ipv4
+public-keys/
+reservation-id
+security-groups
+```
+
+### Using User Data to Save Metadata
+
+```sh
+#!/bin/bash
+
+yum update -y
+yum install httpd -y
+systemctl start httpd
+systemctl enable httpd
+cd /var/www/html
+echo "<html><body><h1>My IP is " > index.html
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+echo "$PUBLIC_IP" >> index.html
+echo "</h1></body></html>" >> index.html
+```
+
+### Exam Tips
+
+<Note>
+User data is simply bootstrap scripts.
+
+Metadata is data stored about your EC2 instances.
+
+You can use bootstrap scripts (user data) to access metadata.
+
+</Note>
+
+## Networking with EC2
+
+### Different Virtual Networking Options
+
+You can attach 3 different types of **virtual networking cards** to your EC2 instances.
+
+- **ENI - Elastic Network Interface** - for basic, day-to-day networking.
+- **EN - Enhanced Networking** - uses single root I/O virtualization (SR-IOV) to provide high performance.
+- **EFA - Elastic Fabric Adapter** - accelerates High Performance Computing (HPC) and machine learning apps.
+
+### ENI
+
+A virtual network card that allows:
+
+- Private IPv4 Addresses
+- Public IPv4 Address
+- Many IPv6 Addresses
+- MAC Address
+- 1 or more Security Groups
+
+Common ENI use cases:
+
+- Create a management network.
+- Use network and security appliances in your VPC.
+- Create dual-homed instances with workloads/roles on distinct subnets.
+- Create a low-budget, high-availability solution.
+
+### Enhanced Networking
+
+For high-performance networking between 10 - 100 Gbps.
+
+**Single Root I/O Virtualization (SR-IOV)**
+
+- SR-IOV provides higher I/O performance and lower CPU utilization.
+
+**Performance**
+
+- Provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies.
+
+### ENA vs VF
+
+Depending on your instance type, enhanced networking can be enabled using:
+
+| Elastic Network Adapter (ENA)                                          | Intel 82599 Virtual Function (VF) Interface                                                               |
+| :--------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- |
+| Supports network speeds of up to 100 Gbps for supported instance types | Supports network speeds of up to 10 Gbps for supported instance types. Typically used on older instances. |
+
+<Tip>In any scenario question: choose ENA of VF interface.</Tip>
+
+### EFA
+
+Elastic Fabric Adapter
+
+- A network device you can attach to your Amazon EC2 instance to accelerate High Performance Computing (HPC) and machine learning apps.
+- Provides lower and more consistent latency and higher throughput that the TCP transport traditionally used in cloud-based HPC systems.
+
+<Tip>
+EFA can use OS-bypass.
+
+It makes it a lot **faster** with much **lower latency**.
+
+OS-bypass enables HPC and machine learning apps to bypass the operating system kernel and communicate directly with the EFA device. Not currently supported with Windows - only Linux.
+
+</Tip>
+
+### Exam Tips
+
+<Note>
+**ENI**  
+For basic networking. Perhaps you need a separate management network from your production network or a separate logging network, and you need to do this at a low cost. In this scenario, use multiple ENIs for each network.
+
+**Enhanced Networking**  
+For when you need speeds between 10 Gbps and 100 Gbps. Anywhere you need reliable, high throughput.
+
+**EFA**  
+For when you need to accelerate High Performance Computing (HPC) and machine learning apps or if you need to do an OS-bypass. If you see a scenario question mentioning HPC or ML and asking what network adapter you want, choose EFA.
+
+</Note>
+
+## Optimizing with EC2 Placement Groups
+
+### 3 Types of Placement Groups
+
+- Cluster
+- Spread
+- Partition
+
+### Cluster Placement Groups
+
+Grouping of instances within a single Availability Zone. Recommended for apps that need low network latency, high network throughput, or both.
+
+<Note>
+  Only certain instance types can be launched into a cluster placement group.
+</Note>
+
+### Spread Placement Groups
+
+A group of instances that are **each placed on distinct underlying hardware**. Recommended for apps that have small number of critical instances that should be kept separate from each other.
+
+<Tip>Used for individual instances.</Tip>
+
+### Partition Placement Groups
+
+Each partition placement group has its own set of racks. Each rack has its own network and power source. No 2 partitions within a placement group share the same racks, allowing you to isolate the impact of hardware failure within your app.
+
+EC2 divides each group into logical segments called **partitions**.
+
+### Exam Tips
+
+ <Note>
+**Cluster Placement Groups**  
+Low network latency, high network throughput.
+
+**Spread Placement Groups**  
+Individual critical EC2 instances.
+
+**Partition Placement Groups**  
+Multiple EC2 instances; HDFS, HBase, and Cassandra.
+
+A **cluster placement group** can't span mulitple Availability Zones, whereas a spread placement group and partition placement group can.
+
+Only **certain types of instances** can be launched in a placement group (compute optimized, GPU, memory optimized, storage optimized).
+
+**AWS recommends homogenous instances** within cluster placement groups.
+
+**You can't merge placement groups.**
+
+You can **move an existing instance into a placement group.** Before you move the instance, the instance must be in a stopped state. You can move or remove an instance using the AWS CLI or an AWS SDK, but you can't do it via the console yet.
+
+ </Note>
+
+## Solving Licensing Issues with Dedicated Hosts
+
+### The Different Pricing Models for EC2
+
+**On-Demand**  
+Pay by the hour or the second, depedning on the type of instance you run.
+
+**Reserved**  
+Reserved capacity for 1 or 3 years. Up to 72% discount on the hourly change.
+
+**Spot**  
+Purchase unused capacity at a discount of up to 90%. Prices fluctuate with supply and demand.
+
+**Dedicated**  
+A physical EC2 server dedicated for your use. The most expensive option.
+
+### Dedicated Hosts
+
+**Compliance**  
+Regulatory requirements that may not support multi-tenant virtualization.
+
+**Licensing**  
+Great for licensing that does not support multi-tenancy or cloud deployments.
+
+**On-Demand**  
+Can be purchased on-demand (hourly).
+
+**Reserved**  
+Can be purchased as a reservation for up to 70% off the on-demand price.
+
+### Exam Tips
+
+<Note>
+  **Any question that talks about special licensing requirements.** A **Amazon
+  EC2 Dedicated Host** is a **physical server** with EC2 instance capacity fully
+  dedicated to your use. Hosts allow you to **use your existing** per-socket,
+  per-core, or per-VM software **licenses**, including Windows Server, Microsoft
+  SQL Server, and SUSE Linux Enterprise Server.
+</Note>
+
+## Timing Workloads with Spot Instances and Spot Fleets
+
+### What are EC2 Spot Instances
+
+### Spot Prices
+
+### Spot Blocks
+
+### Use Cases
+
+### Terminating Spot Instances
+
+### What are Spot Fleets
+
+### Launch Pools
+
+### Strategies
+
+### Exam Tips
