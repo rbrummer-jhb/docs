@@ -1543,8 +1543,8 @@ It is simply data about your EC2 instance.
 Using the `curl` command, we can query metadata about our EC2 instance.
 
 ```sh
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
-&& curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/
+TOKEN=`curl -X PUT "http://52.71.116.78/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
+&& curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://52.71.116.78/latest/meta-data/
 ami-id
 ami-launch-index
 ami-manifest-path
@@ -1583,8 +1583,8 @@ systemctl start httpd
 systemctl enable httpd
 cd /var/www/html
 echo "<html><body><h1>My IP is " > index.html
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+TOKEN=$(curl -s -X PUT "http://52.71.116.78/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://52.71.116.78/latest/meta-data/public-ipv4)
 echo "$PUBLIC_IP" >> index.html
 echo "</h1></body></html>" >> index.html
 ```
@@ -1936,3 +1936,1157 @@ Bring the AWS Management Console, APIs, and SDKs into your data center, allowing
 <Note>
   Scenario about extending AWS to your data center? **Think AWS Outposts**
 </Note>
+
+## Lab: EC2 Instance Bootstrapping
+
+### Manually Install Software on `webserver-01`
+
+**Set up `apache2`**
+
+1. From the AWS Management Console, navigate to EC2.
+2. In **Resources** at the top, click \*\*Instances (running).
+3. Select the `webserver-01` instance and click **Connect**.
+4. Select **EC2 Instance Connect** and click **Connect** to open a terminal window. (Alternatively, you can also use your own local terminal to log in to the server using the credentials provided on the lab page for **Cloud Server of webserver-01**.)
+
+```sh
+ssh cloud_user@<PUBLIC_IP_ADDRESS>
+```
+
+5. Update and install the packages, using the same password as before, when prompted:
+
+```sh
+sudo apt-get update && sudo apt-get upgrade -y
+```
+
+<Note>Note: It may take a few minutes to complete.</Note>
+
+6. Install the `apache2` web server:
+
+```sh
+sudo apt-get install apache2 -y
+```
+
+7. Once installed, return to the AWS Management Console to confirm the `apache2` install was successful:
+
+- Click the checkbox next to **webserver-01**.
+- Scroll down to the Details section of the page and copy the Public IPv4 address.
+- Paste the IP address in the address bar of a new browser tab.
+
+<Note>
+  Note: If using the open address link, you may receive an error that the site
+  can't be reached. This is because the link defaults to HTTPS instead of HTTP.
+  In the address URL, change HTTPS to HTTP to load the Apache2 default welcome
+  page.
+</Note>
+
+**Set Up the AWL CLI Tool**
+
+1. Return to the terminal window and install the `unzip` tool:
+
+```sh
+sudo apt-get install unzip -y
+```
+
+2. Download the AWS CLI tool:
+
+```sh
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+```
+
+3. Unzip the file:
+
+```sh
+unzip awscliv2.zip
+```
+
+4. Install the AWS CLI tool:
+
+```sh
+sudo ./aws/install
+```
+
+5. Verify AWS CLI version 2 has been installed:
+
+```sh
+aws --version
+```
+
+6. To edit the web page's `index.html` file, you'll need to grant user access to the file:
+
+```sh
+sudo chmod 777 /var/www/html/index.html
+```
+
+7. To get instance metadata about the server's Availability Zone, enter the following command Observe the Availability Zone is listed at the front of the username in the result:
+
+```sh
+curl http://52.71.116.78/latest/meta-data/placement/availability-zone
+```
+
+<Note>
+  Note: If you don't see any output, wait a moment and retry the command.
+</Note>
+
+8. Add the Availability Zone, instance ID, public IP, and local IP instance metadata to the `index.html` file (paste all of this into the terminal):
+
+```sh
+echo '<html><h1>Bootstrap Demo</h1><h3>Availability Zone: ' > /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/placement/availability-zone >> /var/www/html/index.html
+echo '</h3> <h3>Instance Id: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/instance-id >> /var/www/html/index.html
+echo '</h3> <h3>Public IP: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/public-ipv4 >> /var/www/html/index.html
+echo '</h3> <h3>Local IP: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/local-ipv4 >> /var/www/html/index.html
+echo '</h3></html> ' >> /var/www/html/index.html
+```
+
+9. Navigate back to the Apache web page, and refresh it to view the results of the changes you made.
+10. Return to the terminal and install `mysql`:
+
+```sh
+sudo apt-get install mysql-server -y
+```
+
+<Note>Note: It may take a few minutes for MySQL to install.</Note>
+
+### Use a Bootstrap Script to Build `webserver-02` and Debug Issues
+
+**Set Up the Script**
+
+1. Return to the AWS Management Console and navigate to EC2.
+2. On the EC2 dashboard, click **Launch instances**.
+3. In the **Launch an instance** section, under **Name and tags** type `webserver-02`.
+4. Scroll down to the **Application and OS Images (Amazon Machine Image)** to select the **Ubuntu** logo, click the dropdown menu to select **Ubuntu Server 24.04 LTS (HVM), SSD Volume Type**.
+5. Scroll down to the **Instance type**, and click the dropdown menu to select `t3.micro`.
+6. Under **Key pair (login)**, click the dropdown and select **Proceed without a key pair (Not recommended) Default value**.
+7. Under Network settings, click Edit and enter the following information:
+
+- **Auto-assign public IP**: Select **Enable** from the dropdown menu.
+- **Firewall (security groups)**: Choose **Select existing security group**.
+- **Common security groups**: Select `EC2SecurityGroup` from the dropdown menu.
+
+8. Under **Advanced details**, click the dropdown arrow to expand.
+9. Scroll down to **Metadata version** and select **V1 and V2 (token optional)**.
+10. Scroll down to **User data** and paste in the following bootstrap script:
+
+```sh
+#!/bin/bash
+sudo apt-get update -y
+sudo apt-get install apache2 unzip -y
+sudo systemctl enable apache2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+echo '<html><h1>Bootstrap Demo</h1><h3>Availability Zone: ' > /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/placement/availability-zone >> /var/www/html/index.html
+echo '</h3> <h3>Instance Id: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/instance-id >> /var/www/html/index.html
+echo '</h3> <h3>Public IP: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/public-ipv4 >> /var/www/html/index.html
+echo '</h3> <h3>Local IP: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/local-ipv4 >> /var/www/html/index.html
+echo '</h3></html> ' >> /var/www/html/index.html
+sudo apt-get install mysql-server
+sudo systemctl enable mysql
+```
+
+11. Click **Launch instance**.
+
+**Connect to and View `webserver-02`**
+
+1. Once the instance launch has been successfully initiated, click **View all instances**.
+2. Click the refresh button, if `webserver-02` is not displayed.
+
+<Note>
+  Note: It may take a few minutes for webserver-02to complete its configuration.
+</Note>
+
+3. Once the `webserver-02` instance has passed status checks, select this instance, and click **Connect**.
+4. Select **EC2 Instance Connect** and click **Connect**.
+5. In the terminal, check if Apache was installed correctly. The output should display `Active: active (running)`:
+
+```sh
+sudo systemctl status apache2
+```
+
+6. Verify `apache2` is running. The output should display a few `apache2` processes:
+
+```sh
+ps aux | grep apache
+```
+
+7. Verify `mysql` is running:
+
+```sh
+sudo systemctl status mysql
+```
+
+8. Try using `mysqld`:
+
+```sh
+sudo systemctl status mysql
+```
+
+9. Check for any running `mysql` processes:
+
+```sh
+ps aux | grep mysql
+```
+
+10. Try to start the `mysql` service:
+
+```sh
+sudo systemctl start mysql
+```
+
+<Note>
+  Note: These commands should all return an error that the mysql service was not
+  found.
+</Note>
+
+11. Use `curl` to retrieve the `user-data`:
+
+```sh
+curl http://52.71.116.78/latest/user-data
+```
+
+12. At the bottom of the script, notice the following code:
+
+```sh
+sudo apt-get install mysql-server
+```
+
+13. Observe the code is missing the `-y` flag needed for `mysql` to automatically install without a user prompt.
+
+Install `mysql-server` manually:
+
+```sh
+sudo apt-get install mysql-server -y
+```
+
+14. Enable the `mysql` service:
+
+```sh
+sudo systemctl enable mysql
+```
+
+### Use a Fixed Bootstrap Script to Build `webserver-03`
+
+**Set Up the Script**
+
+1. Navigate back to the EC2 dashboard, and click **Launch instances**.
+2. In the **Launch an instance** section, under **Name and tags** type `webserver-03`.
+3. Scroll down to the **Application and OS Images (Amazon Machine Image)** to select the **Ubuntu** logo, click the dropdown menu to select **Ubuntu Server 24.04 LTS (HVM), SSD Volume Type**.
+4. Scroll down to the **Instance type**, and click the dropdown menu to select `t3.micro`.
+5. Under **Key pair (login)**, click the dropdown and select **Proceed without a key pair (Not recommended) Default value**.
+6. Under **Network settings**, click **Edit** and enter the following information:
+
+- **Auto-assign public IP**: Select **Enable** from the dropdown menu.
+- **Firewall (security groups)**: Choose **Select existing security group**.
+- **Common security groups**: Select `EC2SecurityGroup` from the dropdown menu.
+
+7. Under **Advanced details**, click the dropdown arrow to expand.
+8. Scroll down to **Metadata version** and select **V1 and V2 (token optional)**.
+9. Scroll down to **User data** and paste in the following bootstrap script:
+
+```sh
+#!/bin/bash
+sudo apt-get update -y
+sudo apt-get install apache2 unzip -y
+sudo systemctl enable apache2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+echo '<html><h1>Bootstrap Demo</h1><h3>Availability Zone: ' > /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/placement/availability-zone >> /var/www/html/index.html
+echo '</h3> <h3>Instance Id: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/instance-id >> /var/www/html/index.html
+echo '</h3> <h3>Public IP: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/public-ipv4 >> /var/www/html/index.html
+echo '</h3> <h3>Local IP: ' >> /var/www/html/index.html
+curl http://52.71.116.78/latest/meta-data/local-ipv4 >> /var/www/html/index.html
+echo '</h3></html> ' >> /var/www/html/index.html
+sudo apt-get install mysql-server -y
+sudo systemctl enable mysql
+```
+
+This time, the `-y` flag for `mysql` has been added.
+
+10. Click **Launch instance**.
+
+**Connect to and View `webserver-03`**
+
+1. Once the instance launch is initiated, click **View all instances**.
+   2.Click the refresh button, if `webserver-03` is not displayed.
+
+<Note>
+  Note: It may take a few minutes for webserver-03to complete launching.
+</Note>
+
+3. While you are waiting for `webserver-03` to complete its setup, check if the `index.html` file for `webserver-02` has been configured correctly.
+4. Select `webserver-02` from the **Instances** list, and copy the **Public IPv4 address**.
+5. Paste the IP address in a new browser tab to access the Apache web page. Observe the information that's returned.
+6. Navigate back to the EC2 dashboard, and click the refresh button to check the status of `webserver-03`.
+7. Once the `webserver-03` instance has passed its status checks, select this instance and click **Connect**.
+8. Select **EC2 Instance Connect** and click **Connect** to connect to the `webserver-03` instance in a new terminal window.
+9. In the terminal, check if Apache was installed correctly. The output should display `Active: active (running)`:
+
+```sh
+sudo systemctl status apache2
+```
+
+10. Verify `apache2` is running. The output should display a few `apache2` processes:
+
+```sh
+ps aux | grep apache
+```
+
+11. Verify `mysql` was installed:
+
+```sh
+systemctl status mysql
+```
+
+This time, it is running.
+
+12. Confirm `mysql` processes:
+
+```sh
+ps aux | grep mysql
+```
+
+13. Verify AWS CLI tool was installed:
+
+```sh
+aws --version
+```
+
+14. Navigate back to the EC2 dashboard and copy the **Public IP address** for `webserver-03`.
+15. Paste the IP address in a new tab to confirm the Apache web page for `webserver-03`.
+
+## Lab: EC2 Roles and Instance Profiles in AWS
+
+### Create a Trust Policy and Role Using the AWS CLI
+
+**Obtain the `labreferences.txt` File**
+
+1. Navigate to S3.
+2. From the list of buckets, open the one that contains the text `s3bucketlookupfiles` in the middle of its name.
+3. Select the `labreferences.txt` file.
+4. Click **Actions** > **Download**.
+5. Open the `labreferences.txt` file, as we will need to reference it throughout the lab.
+
+**Log in to Bastion Host and Set the AWS CLI Region and Output Type**
+
+1. Navigate to **EC2** > **Instances**.
+2. Copy the public IP of the Bastion Host instance.
+3. Open a terminal, and log in to the bastion host via SSH:
+
+```sh
+ssh cloud_user@<BASTION_HOST_PUBLIC_IP>
+```
+
+For more information on how to connect to a Linux instance using SSH, please refer to the [AWS Documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html). For more information on how to connect to a Linux instance using Putty, please refer to [Connect to your Linux instance from Windows using PuTTY](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html).
+
+4. Enter the password provided for it on the lab page.
+5. Run the following command:
+
+```
+[cloud_user@bastion]$ aws configure
+```
+
+6. Press **Enter** twice to leave the AWS Access Key ID and AWS Secret Access Key blank.
+7. Enter `us-east-1` as the default region name.
+8. Enter `json` as the default output format.
+
+**Create IAM Trust Policy for an EC2 Role**
+
+1. Create a file called `trust_policy_ec2.json`:
+
+```sh
+[cloud_user@bastion]$ nano trust_policy_ec2.json
+```
+
+2. Paste in the following content:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "ec2.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+3. Save and quit the file by pressing `^X`, `Y` to save, and hit **return** to accept the existing file name.
+
+**Create the DEV_ROLE IAM Role**
+
+1. Run the following AWS CLI command:
+
+```sh
+[cloud_user@bastion]$ aws iam create-role --role-name DEV_ROLE --assume-role-policy-document file://trust_policy_ec2.json
+```
+
+**Create an IAM Policy Defining Read-Only Access Permissions to an S3 Bucket**
+
+1. Create a file called `dev_s3_read_access.json`:
+
+```sh
+[cloud_user@bastion]$ nano dev_s3_read_access.json
+```
+
+2. Enter the following content, replacing `<DEV_S3_BUCKET_NAME>` with the bucket name provided in the `labreferences.txt` file:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowUserToSeeBucketListInTheConsole",
+      "Action": ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
+      "Effect": "Allow",
+      "Resource": ["arn:aws:s3:::*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:Get*", "s3:List*"],
+      "Resource": [
+        "arn:aws:s3:::<DEV_S3_BUCKET_NAME>/*",
+        "arn:aws:s3:::<DEV_S3_BUCKET_NAME>"
+      ]
+    }
+  ]
+}
+```
+
+3. Save and quit the file by pressing `^X`, `Y` to save, and hit **return** to accept the existing file name.
+4. Create the managed policy called `DevS3ReadAccess`:
+
+```sh
+[cloud_user@bastion]$ aws iam create-policy --policy-name DevS3ReadAccess --policy-document file://dev_s3_read_access.json
+```
+
+5. Copy the policy ARN in the output, and paste it into the `labreferences.txt` file — we'll need it in a minute.
+
+### Create Instance Profile and Attach Role to an EC2 Instance
+
+**Attach Managed Policy to Role**
+
+1. Attach the managed policy to the role, replacing `<DevS3ReadAccess_POLICY_ARN>` with the ARN you just copied:
+
+```sh
+[cloud_user@bastion]$ aws iam attach-role-policy --role-name DEV_ROLE --policy-arn "<DevS3ReadAccess_POLICY_ARN>"
+```
+
+2. Verify the managed policy was attached:
+
+```sh
+[cloud_user@bastion]$ aws iam list-attached-role-policies --role-name DEV_ROLE
+```
+
+**Create the Instance Profile and Add the DEV_ROLE via the AWS CLI**
+
+1. Create instance profile named `DEV_PROFILE`:
+
+```sh
+[cloud_user@bastion]$ aws iam create-instance-profile --instance-profile-name DEV_PROFILE
+```
+
+2. Add role to the `DEV_PROFILE` called `DEV_ROLE`:
+
+```sh
+[cloud_user@bastion]$ aws iam add-role-to-instance-profile --instance-profile-name DEV_PROFILE --role-name DEV_ROLE
+```
+
+3. Verify the configuration:
+
+```sh
+[cloud_user@bastion]$ aws iam get-instance-profile --instance-profile-name DEV_PROFILE
+```
+
+**Attach the `DEV_PROFILE` Role to an Instance**
+
+1. In the AWS console, navigate to **EC2** > **Instances**.
+2. Copy the instance ID of the instance named Web Server instance and paste it into the `labreferences.txt` file — we'll need it in a second.
+3. In the terminal, attach the `DEV_PROFILE` to an EC2 instance, replacing `<LAB_WEB_SERVER_INSTANCE_ID>` with the Web Server instance ID you just copied:
+
+```sh
+[cloud_user@bastion]$ aws ec2 associate-iam-instance-profile --instance-id <LAB_WEB_SERVER_INSTANCE_ID> --iam-instance-profile Name="DEV_PROFILE"
+```
+
+4. Verify the configuration (be sure to replace `<LAB_WEB_SERVER_INSTANCE_ID>` with the Web Server instance ID again):
+
+```sh
+[cloud_user@bastion]$ aws ec2 describe-instances --instance-ids <LAB_WEB_SERVER_INSTANCE_ID>
+```
+
+This command's output should show this instance is using `DEV_PROFILE` as an `IamInstanceProfile`. Verify this by locating the `IamInstanceProfile` section in the output, and look below to make sure the `"Arn"` ends in `/DEV_PROFILE`.
+
+### Test S3 Permissions via the AWS CLI
+
+1. In the AWS console, copy the public IP of the Web Server instance.
+2. Open a new terminal.
+3. Log in to the web server instance via SSH:
+
+```sh
+ssh cloud_user@<WEB_SERVER_PUBLIC_IP>
+```
+
+4. Use the same password for the bastion host provided on the lab page.
+5. Verify the instance is assuming the `DEV_ROLE` role:
+
+```sh
+[cloud_user@webserver]$ aws sts get-caller-identity
+```
+
+We should see `DEV_ROLE` in the `Arn`.
+
+6. List the buckets in the account:
+
+```sh
+[cloud_user@webserver]$ aws s3 ls
+```
+
+Copy the entire name (starting with `cfst`) of the bucket with `s3bucketdev` in its name.
+
+7. Attempt to view the files in the `s3bucketdev-` bucket, replacing `<s3bucketdev-123>` with the bucket name you just copied:
+
+```sh
+[cloud_user@webserver]$ aws s3 ls s3://<s3bucketdev-123>
+```
+
+We should see a list of files.
+
+### Create an IAM Policy and Role Using the AWS Management Console
+
+**Create Policy**
+
+1. In the AWS console, navigate to **IAM** > **Policies**.
+2. Click **Create policy**.
+3. Click the **JSON** tab.
+4. Paste the following text as the policy, replacing `<PROD_S3_BUCKET_NAME>` with the bucket name provided in the `labreferences.txt` file:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowUserToSeeBucketListInTheConsole",
+      "Action": ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
+      "Effect": "Allow",
+      "Resource": ["arn:aws:s3:::*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:Get*", "s3:List*"],
+      "Resource": [
+        "arn:aws:s3:::<PROD_S3_BUCKET_NAME>/*",
+        "arn:aws:s3:::<PROD_S3_BUCKET_NAME>"
+      ]
+    }
+  ]
+}
+```
+
+5. Click **Next**.
+6. Enter `ProdS3ReadAccess` as the policy name.
+7. Click **Create policy**.
+
+**Create Role**
+
+1. Click **Roles** in the left-hand menu.
+2. Click **Create role**.
+3. Under Choose a use case, select **EC2**.
+4. Click **Next**.
+5. In the Filter policies search box, enter `ProdS3ReadAccess`.
+6. Click the checkbox to select `ProdS3ReadAccess`.
+7. Click **Next**.
+8. Give it a Role name of `PROD_ROLE`.
+9. Click **Create role**.
+
+### Attach IAM Role to an EC2 Instance Using the AWS Management Console
+
+1. Navigate to **EC2** > **Instances**.
+2. Select the Web Server instance.
+3. Click **Actions** > **Security** > **Modify IAM role**.
+4. In the IAM role dropdown, select `PROD_ROLE`.
+5. Click **Update IAM role**.
+
+**Test the Configuration**
+
+1. Open the existing terminal connected to the Web Server instance. (You may need to reconnect if you've been disconnected.)
+2. Determine the identity currently being used:
+
+```sh
+[cloud_user@webserver]$ aws sts get-caller-identity
+```
+
+This time, we should see `PROD_ROLE` in the `Arn`.
+
+3. List the buckets:
+
+```sh
+[cloud_user@webserver]$ aws s3 ls
+```
+
+4. Copy the entire name (starting with `cfst`) of the bucket with `s3bucketprod` in its name.
+5. Attempt to view the files in the `s3bucketprod-` bucket, replacing `<s3bucketprod-123>` with the bucket name you just copied:
+
+```sh
+[cloud_user@webserver]$ aws s3 ls s3://<s3bucketprod-123>
+```
+
+It should list the files.
+
+6. In the `aws s3 ls` command output, copy the entire name (starting with `cfst`) of the bucket with `s3bucketsecret` in its name.
+7. Attempt to view the files in the `<s3bucketsecret-123>` bucket, replacing `<s3bucketsecret-123>` with the bucket name you just copied:
+
+```sh
+[cloud_user@webserver]$ aws s3 ls s3://<s3bucketsecret-123>
+```
+
+This time, our access will be denied — which means our configuration is properly set up.
+
+## Quiz: Elastic Cloud Compute EC2
+
+<Note>
+Which of the following is not a valid use case for IAM roles?
+
+Defining a set of permissions for an IAM role, and directly associating that role with an IAM group.
+
+Why would you want to spin up an EC2 Dedicated Host?
+
+Because your application has hardware-specific licensing requirements
+
+When would you need to create an EC2 Dedicated Instance?
+
+When you have an auditing requirement to run your hosts on single-tenant hardware
+
+What happens when your Spot instance is chosen by AWS for termination?
+
+While it is possible that your Spot Instance is interrupted before the warnings can be made, AWS makes a best effort to provide two-minute Spot Instance interruption notices to the metadata of your EC2 instance(s).
+
+Which AWS service allows you to bring the power of AWS to your on-premises data center?
+
+AWS Outposts
+
+</Note>
+
+# Chapter 6 - Elastic Block Storage EBS and Elastic File System EFS
+
+- [EBS Overview](#ebs-overview)
+- [Volumes and Snapshots](#volumes-and-snapshots)
+- [Protecting EBS Volumes with Encryption](#protecting-ebs-volumes-with-encryption)
+- [EC2 Hibernation](#ec2-hibernation)
+- [EFS Overview](#efs-overview)
+- [FSx Overview](#fsx-overview)
+- [Amazon Machine Image: EBS vs Instance Store](#amazon-machine-image-ebs-vs-instance-store)
+- [AWS Backups](#aws-backups)
+- [Lab: Reduce Storage Costs with EFS](#lab-reduce-storage-costs-with-efs)
+- [Quiz: EBS abd EFS](#quiz-ebs-and-efs)
+
+## EBS Overview
+
+### Understanding EBS Volumes
+
+**Elastic Block Store**
+
+Storage volumes you can attach to your EC2 instances.
+
+Use them the same way you would use any system disk.
+
+- Create a file system.
+- Run a database.
+- Run an operating system.
+- Store data.
+- Install applications.
+
+### Mission Critical
+
+**Production Workloads**  
+Designed for mission-critical workloads.
+
+**Highly Available**  
+Automatically replicated within a single Availability Zone to protect against hardware failures.
+
+**Scalable**  
+Dynamically increase capacity and change the volume type with no downtime or performance impact to your live systems.
+
+### Solid State Disk
+
+**General Purpose SSD (`gp2`)**
+
+- 3 IOPS per GiB, **up to maximum of 16000 IOPS per volume**.
+- `gp2` volumes **smaller than 1 TB** can burst up to 3000 IOPS.
+- **Good for boot volumes** or development and test applications that are not latency sensitive.
+
+**General Purpose SSD (`gp3`)**
+
+- Predictable **3000 IOPS baseline performance** and 125 MiB/s regardless of volume size.
+- Ideal for applications that **require high performance at a low cost**, such as MySQL, Cassandra, virtual desktops, and Hadoop analytics.
+- Customers looking for higher performance **can scale up** to 16000 IOPS and 1000 MiB/s for an additional fee.
+- The top performance of `gp3` is **4 times faster than max** throughput of `gp2` volumes.
+
+**Provisiones IOPS SSD (`io1`)**
+
+- Up to 64000 IOPS per volume. 50 IOPS per GiB.
+- Use if you need more than 16000 IOPS.
+- Designed for I/O-intensive applications, large databases, and latency-sensitive workloads.
+
+**Provisioned IOPS SSD (`io2`)**
+
+- Latest generation.
+- Higher durability and more IOPS.
+- 500 IOPS per GiB. **Up to 64000 IOPS**.
+- 99.999% durability **instead of up to 99.9%**.
+- I/O-intensive apps, large databases, and latency-sensitive workloads. **Applications that need high levels of durability**.
+
+<Note>`io2` is the same price as `io1`.</Note>
+
+### Hard Disk Drive
+
+**Throughput Optimized HDD (`st1`)**
+
+Low cost HDD volume.
+
+- Baseline throughput of 40 MB/s per TB.
+- Ability to burst up to 250 MB/s per TB.
+- Maximum throughput of 500 MB/s per volume.
+- Frequently accessed, throughput-intensive workloads.
+- Big data, data warehouses, ETL, and log processing.
+- A cost-effective way to store mountains of data.
+- Cannot be a boot volume.
+
+**Cold HDD (`sc1`)**
+
+Lowest cost option.
+
+- Baseline throughput of 12 MB/s per TB.
+- Ability to burst up to 80 MB/s per TB.
+- Max throughput of 250 MB/s per volume.
+- A good choice for colder data requiring fewer scans per day.
+- Good for applications that need the lowest cost and performance is not a factor.
+- Cannot be a boot volume.
+
+### IOPS vs Throughput
+
+| IOPS                                                                                | Throughput                                                             |
+| :---------------------------------------------------------------------------------- | :--------------------------------------------------------------------- |
+| Measures the number of read and write operations per second.                        | Measures the number of bits read or written per second (MB/s).         |
+| Important metric for quick transactions, low-latency apps, transactional workloads. | Important metric for large datasets, large I/O sizes, complex queries. |
+| The ability to action reads and writes very quickly.                                | The ability to deal with large datasets.                               |
+| Choose Provisioned IOPS SSD (`io1` or `io2`).                                       | Choose Throughput Optimized HDD (`st1`)                                |
+
+### Exam Tips
+
+<Note>
+Highly available and scalable storage volumes **you can attach to an EC2 instances**.
+
+**General Purpose SSD (`gp2`)**
+
+Suitable for boot disks and general applications.
+
+Up to 16000 IOPS per volume.
+
+Up to 99.9% durability.
+
+**General Purpose SSD (`gp3`)**
+
+Suitable for high performance applications.
+
+Predictable 3000 IOPS baseline performance and 125 MiB/s regardless of volume size.
+
+Up to 99.9% durability.
+
+**Provisioned IOPS SSD (`io1`)**
+
+Suitable for OLTP and latency-sensitive applications.
+
+50 IOPS/GiB.
+
+Up to 64000 IOPS per volume.
+
+High performance and most expensive.
+
+Up to 99.9% durability.
+
+**Provisioned IOPS SSD (`io2`)**
+
+Suitable for OLTP and latency-sensitive applications.
+
+500 IOPS/GiB.
+
+Up to 64000 IOPS per volume.
+
+99.999% durability.
+
+Latest generation Provisioned IOPS volume.
+
+**Throughput Optimized HDD (`st1`)**
+
+Suitable for big data, data warehouses, and ETL.
+
+Max throughput is 500 MB/s per volume.
+
+Cannot be a boot volume.
+
+Up to 99.9% durability.
+
+**Cold HDD (`sc1`)**
+
+Max throughput of 250 MB/s per volume.
+
+Less frequently accessed data.
+
+Cannot be a boot volume.
+
+Lowest cost.
+
+</Note>
+
+## Volumes and Snapshots
+
+### What are Volumes
+
+- Volumes exist on EBS
+- Volumes are simply virtual hard disks.
+- You need a minimum of 1 volume per EC2 instance.
+- **This is called the root device volume.**
+
+### What are Snapshots
+
+**Snapshots exist on S3**  
+Think of snapshots as a photograph of the virtual disk/volume.
+
+**Snapshots are point in time**  
+When you take a snapshot, it is a point-in-time copy of a volume.
+
+**Snapshots are incremental**  
+This means only the data that has been changed since your last snapshot are moved to S3. This saves dramatically on space and the time it takes to take a snapshot.
+
+**The first snapshot**  
+If it is your first snapshot, it may take some time to create as there is no previous point-in-time copy.
+
+### 3 Tips for Snapshots
+
+**Consistent Snapshots**  
+Snapshots only capture data that has been written to your Amazon EBS volume, which might exclude any data that has been locally cached by your application or OS. For a consistent snapshot, it is recommended you stop the instance and take a snap.
+
+**Encrypted Snapshots**  
+If you take a snapshot of an encrypted EBS volume, the snapshot will be encrypted automatically.
+
+**Sharing Snapshots**  
+You can share snapshots, but only in the region in which they were created. To share to other regions, you will need to copy them to the destination region first.
+
+### What to Know about EBS Volumes
+
+**Location - EBS volumes will always be in the same AZ as EC2.**  
+Your EBS volumes will always be in the same AZ as the EC2 instance to which it is attached.
+
+**Resizing - Resize on the fly.**  
+You can resize EBS volumes on the fly. You do not need to stop or restart the instance. However, you will need to extend the filesystem in the OS so the OS can see the resized volume.
+
+**Volume Type - Switch volume types**  
+You can change the volume types on the fly (e.g. go from `gp2` to `io2`). You do not need to stop or restart the instance.
+
+### Exam Tips
+
+<Note>
+Volumes exist on EBS, whereas snapshots exist on S3.
+
+Snapshots are point-in-time photographs of volumes and are in incremental in nature.
+
+The first snapshot will take some time to create. For consistent snapshots, stop the instance and detach the volume.
+
+You can share snapshots between AWS accounts as well as between regions, but first you need to copy that snapshot to the target region.
+
+You can resize EBS volumes on the fly as well as changing the volume types.
+
+</Note>
+
+## Protecting EBS Volumes with Encryption
+
+### EBS Encryption
+
+- EBS encrypts your volume with a data key using the industry-standard AES-256 algorithm.
+- Amazon EBS encryption uses AWS Key Management Service (AWS KMS) customer master keys (CMK) when creating encrypted volumes and snapshots.
+
+### What Happens When You Encrypt
+
+- Data at rest is encrypted inside the volume.
+- All data in flight moving between the instance and the volume is encrypted.
+- All snapshots are encrypted.
+- All volumes created from the snapshot are encrypted.
+
+### Encryption Explored
+
+**Handled Transparently**  
+Encryption and decryption are handled transparently (you don't need to do anything).
+
+**Latency**  
+Encryption has a minimal impact on latency.
+
+**Copying**  
+Copying an unencrypted snapshot allows encryption.
+
+**Snapshots**  
+Snapshots of encrypted volumes are encrypted.
+
+**Root Device Volumes**  
+You can now encrypt root device volumes upon creation.
+
+### How to Encrypt Existing Volumes
+
+- Create a snapshot of the unencrypted root device volume.
+- Create a copy of the snapshot and select the encrypt option.
+- Create an AMI from the encrypted snapshot.
+- Use that AMI to launch new encrypted instances.
+
+### Exam Tips
+
+<Note>
+Data at rest is encrypted inside the volume.
+
+All data in flight moving between the instance and the volume is encrypted.
+
+All snapshots are encrypted.
+
+All volumes created from the snapshot are encrypted.
+
+Create a snapshot of the unencrypted root device volume.
+
+Create a copy of the snapshot and select the encrypt option.
+
+Create an AMI from the encrypted snapshot.
+
+Use that AMI to launch new encrypted instances.
+
+</Note>
+
+## EC2 Hibernation
+
+### EBS Behaviors Reviewed
+
+- If an instance is stopped, the **data is kept on the disk (with EBS)** and will remain on the disk until the EC2 instance is started.
+- If an instance is terminated, then by default **the root device volume will also be terminated**.
+
+When an EC2 instance is started:
+
+- **Operating system** boots up.
+- User data script is run (**bootstrap scripts**).
+- **Applications start** (can take some time).
+
+### What is EC2 Hibernation
+
+- The OS is told to perform hibernation (suspend-to-disk).
+- Hibernation **saves the contents** from the instance memory (RAM) to your Amazon EBS root volume.
+- We persist the instance's Amazon EBS root volume and any attached Amazon EBS data volumes.
+
+### EC2 Hibernation in Action
+
+- The **Amazon EBS** root volume is restored to its previous state.
+- The **RAM** contents are reloaded.
+- The processes that were previously running on the instance are resumed.
+- Previously attached data volumes are **reattached and the instance retains its instance ID**.
+
+![EC2 Hibernation](../images/ec2-hibernation.png)
+
+- With EC2 hibernation, **the instance boots much faster**.
+- The OS does not need to reboot because the in-memory state (RAM) is preserved.
+- This is useful for:
+  - Long-running processes.
+  - Services that take time to initialize.
+
+### Exam Tips
+
+<Note>
+**EC2 hibernation** preserves the in-memory RAM on persistent storage (EBS).
+
+**Much faster to boot up** because you **do not need to reload the OS**.
+
+**Instance RAM** must be less than **150 GB**.
+
+**Instance families include instances in** General Purpose, Compute, Memory, and Storage Optimized groups.
+
+**Available for** Windows, Amazon Linux 2 AMI, and Ubuntu.
+
+**Instances can't be hibernated** for more than **60 days**.
+
+</Note>
+
+## EFS Overview
+
+### What is EFS
+
+**Amazon Elastic File System**:
+
+- Managed NFS (network file system) that can be mounted on many EC2 instances.
+- EFS works with EC2 instances in multiple Availability Zones.
+- Highly available and scalable; however, it it expensive.
+
+### Use Cases
+
+**Content Management**  
+Great fit for content management systems, as you can easily share content between EC2 instances.
+
+**web Servers**  
+Also a great fit for web servers. Have just a single folder structure for your website.
+
+### Overview
+
+- Uses NFSv4 protocol.
+- Compatible with Linux-based AMI (Windows not supported at this time).
+- Encryption at rest using KMS.
+- File system scales automatically; no capacity planning required.
+- Pay per use.
+
+### Performance
+
+**1000s Concurrent Connections**  
+EFS can support thousands of concurrent connections (EC2 instances).
+
+**10 Gbps Throughput**  
+EFS can handle up to 1- Gbps in throughput.
+
+**Petabytes Scaling**  
+Scale your storage to petabytes.
+
+### Controlling Performance
+
+**General Purpose**  
+Used for things like web servers, CMS, etc.
+
+**Max I/O**  
+Used for big data, media, processing, etc.
+
+### Storage Tiers
+
+EFS comes with storage tiers and lifecycle management, allowing you to move your data from one tier to another after X number of days.
+
+**Standard**  
+For frequently accessed files.
+
+**Infrequently Accessed**  
+For file not frequently accessed.
+
+### Exam Tips
+
+<Note>
+Supports the Network File System version 4 (NFSv4) protocol.
+
+Only pay for the storage you use (no pre-provisioning required).
+
+Can scale up to petabytes.
+
+Can support thousands of concurrent NFS connections.
+
+Data is stored across multiple AZs within a region.
+
+Read-after-write consistency.
+
+**If you have a scenario-based question around highly scalable shared storage using NFS, think EFS.**
+
+</Note>
+
+## FSx Overview
+
+### FSx for Windows
+
+Amazon FSx for Windows File Server provides a fully managed native Microsoft Windows file system so you can easily move your Windows-based applications that require file storage to AWS.
+
+<Note>Amazon FSx in built on Windows Server.</Note>
+
+### FSx for Windows vs EFS
+
+| FSx for Windows                                                                                                                                  | EFS                                                                                     |
+| :----------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- |
+| A managed Windows Server that **runs Windows Server Message Block** (SMB)-based file services.                                                   | A managed NAS filer for **EC2 instances based on Network File System** (NFS) version 4. |
+| **Designed for Windows** and Windows applications.                                                                                               | One of the **first network file sharing protocols** native to Unix and Linux            |
+| **Supports** AD users, access control lists, groups, and security policies, along with Distributed File System (DFS) namespaces and replication. |                                                                                         |
+
+### FSx for Lustre
+
+A fully managed file system that is optimized for compute-intensive workloads.
+
+- High Performance Computing
+- Machine Learning
+- Media Data Processing Workflows
+- Electronic Design Automation
+
+### FSx for Lustre Performance
+
+With Amazon FSx, you can **launch and run a Lustre file system that can process massive datasets at up to hundreds of gigabytes per second** of throughput, millions of IOPS, and sub-millisecond latencies.
+
+### Exam Tips
+
+<Note>
+**EFS:** when you need distributed, highly resilient storage for Linux instances and Linux-based applications.
+
+**Amazon FSx for Windows:** when you need centralized storage for Windows-based applications, such as SharePoint, Microsoft SQL Server, Workspaces, IIS Web Server, or any other native Microsoft application.
+
+**Amazon FSx for Lustre:** when you need high-speed, high-capacity distributed storage. This will be for applications that do high performance computing (HPC), financial modelling, etc. Remember that FSx for Lustre can store data directly to S3.
+
+</Note>
+
+## Amazon Machine Images: EBS vs Instance Store
+
+### What is an AMI
+
+An Amazon Machine Image provides the information required to launch an instance.
+
+<Note>You must specify an AMI when you launch an instance.</Note>
+
+### 5 Things You Can Base Your AMI On
+
+- Region
+- OS
+- Architecture (32-bit or 64-bit)
+- Launch permissions
+- Storage for the root device (root device volume)
+
+### EBS vs Instance Store
+
+**Amazon EBS**  
+The root device for an instance launched from the AMI is an Amazon EBS volume created from an Amazon EBS snapshot.
+
+**Instance Store**  
+The root device for an instance launched from the AMI is an instance store volume created from a template stored in Amazon S3.
+
+### Instance Store Volumes
+
+<Tip>
+  Instance store volumes are sometimes called ephemeral storage. Instance store
+  volumes **cannot be stopped**. If the underlying host fails, you will lose
+  your data. You can, however, reboot the instance without losing your data. If
+  you delete the instance, you will lose the instance store volume.
+</Tip>
+
+### EBS Volumes
+
+<Tip>
+EBS-backed instances **can be stopped**. You will not lose data on this instance if it is stopped. You can also reboot an EBS volume and not lose your data. By default, the root device volume will be deleted on termination. However, you can tell AWS to keep the root device volume with EBS volumes.
+
+</Tip>
+
+### Exam Tips
+
+<Note>
+Instance store volumes are sometimes called ephemeral storage.
+
+Instance store volumes **cannot be stopped**. If the underlying host fails, you lose your data.
+
+EBS-backed instances **can be stopped**. You will not lose the data on the instance if it is stopped.
+
+You can reboot both EBS and instance store volumes and you will not lose your data.
+
+By default, both root volumes will be deleted on termination. However, with EBS volumes, you can tell AWS to keep the root device volume.
+
+</Note>
+
+<Tip>An AMI is just a blueprint for an EC2 instance.</Tip>
