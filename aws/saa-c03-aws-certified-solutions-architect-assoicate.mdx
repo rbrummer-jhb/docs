@@ -3090,3 +3090,761 @@ By default, both root volumes will be deleted on termination. However, with EBS 
 </Note>
 
 <Tip>An AMI is just a blueprint for an EC2 instance.</Tip>
+
+## AWS Backups
+
+### What is AWS Backup
+
+Backup allows you to consolidate your backups across multiple AWS services, such as EC2, EBS, EFS, Amazon FSx for Lustre, Amazon FSx for Windows File Server, and AWS Storage Gateway.
+
+<Tip>It can include databases such as RDS and DynamoDB.</Tip>
+
+### AWS Backup with Organizations
+
+Backup can be used with AWS Organizations to backup multiple AWS accounts in your organization.
+
+It gives you centralized control across all AWS services, in multiple AWS accounts across the entire AWS organization.
+
+### Benefits
+
+**Central Management**  
+Use a single, central backup console, allowing you to centralize your backups across multiple AWS services and multiple AWS accounts.
+
+**Automation**  
+You can create automated backup schedules and retention policies. You can also create lifecycle policies, allowing you to expire unnecessary backups after a period of time.
+
+**Improved Compliance**  
+Backup policies can be enforced while backups can be encrypted both at rest and in-transit, allowing alignment to regulatory compliance. Auditing is made easy due to a consolidated view of backups across many AWS services.
+
+### Exam Tips
+
+<Note>
+**Consolidation:** Use AWS Backup to back up AWS services, such as EC2, EBS, EFS, Amazon FSx for Lustre and Windows File Server, and AWS Storage Gateway.
+
+**Organizations:** You can use AWS Organizations in conjunction with AWS Backup to back up your different AWS services across multiple AWS accounts.
+
+**Benefits:** Backup gives you centralized control, letting you automate your backups and define lifecycle policies for you data. You get better compliance, as you can enforce your backup policies, ensure your backups are encrypted, and audit them once complete.
+
+</Note>
+
+## Lab: Reduce Storage Costs with EFS
+
+### Create an EFS File System
+
+**Review Your Resources**
+
+1. Navigate to **EC2** using the Services menu or the unified search bar.
+2. In the **Resources** section, select **Instances (running)**.
+3. Click the checkbox next to `webserver-01`.
+
+The instance details display below.
+
+4. Select the **Storage** tab and note the 10 GiB disk attached to the volume.
+
+This is the same configuration used for `webserver-02` and `webserver-03`.
+
+**Create an EFS Volume**
+
+1. In a new browser tab, navigate to **EFS**.
+2. On the right, click **Create file system**.
+3. Fill in the file system details:
+
+- **Name**: In the text box, enter `SharedWeb`.
+- **Virtual Private Cloud (VPC)**: Use the dropdown to select the provided VPC.
+
+4. Click **Customize**.
+
+- For **File system type**: Select **One Zone**.
+- For **Availability Zone**: Leave `us-east-1a` selected.
+
+5. In Lifecycle management, under Transition into Archive click on the dropdown and make sure **None** is selected.
+6. Click **Next** > **Next** > **Next** > **Create** to create the file system.
+7. After the file system is successfully created, click **View file system** in the top right corner.
+8. Select the Network tab and wait for the created network to become available.
+
+<Note>
+  **Note**: You may need to refresh the **Network** details to see an updated
+  mount target status.
+</Note>
+
+9. After the mount target state is available, click **Manage** on the right.
+10. Under **Security groups**, remove the currently attached default security group and then use the dropdown menu to select the `EC2SecurityGroup` group (not the default group).
+11. Click **Save**.
+
+**Configure the Security Groups**
+
+1. Navigate back to the **EC2** browser tab.
+2. In the sidebar menu, select **Security Groups**.
+3. Click the checkbox next to the non-default security group to show the security group details.
+4. Select the **Inbound rules** tab and then click **Edit inbound rules** on the right.
+5. Click **Add rule** and configure the rule:
+
+- **Type**: Use the dropdown to select **NFS**.
+- **Source**: Use the text box to select `0.0.0.0/0`.
+
+6. Click **Save rules**.
+7. In the sidebar menu, select **EC2 Dashboard** and then select **Instances (running)**.
+8. With `webserver-01` selected, click **Connect** along the top right.
+9. Click **Connect**.
+
+This should take you to a new terminal showing your EC2 instance in a new browser tab or window.
+
+### Mount the EFS File System and Test It
+
+**Mount the File System**
+
+1. In the terminal, list your block devices:
+
+```sh
+lsblk
+```
+
+2. View the data inside the 10 GiB disk mounted to `/data`:
+
+```sh
+ls /data
+```
+
+You should see `file.01`-`file.10` listed.
+
+3. Create a directory to attach your EFS volume:
+
+```sh
+sudo mkdir /efs
+```
+
+4. Navigate back to the **EFS** tab showing the `SharedWeb` file system details.
+5. In the top right, click **Attach**.
+6. In the dialog, select **Mount via IP**.
+7. Copy the provided NFS command to your clipboard.
+8. Navigate back to the terminal and paste in the command.
+9. Edit the mount point by changing `efs` to `/efs` in the command:
+
+```sh
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport [Your EFS Volume IP Here]:/ /efs
+```
+
+10. Press **Enter** to run the command.
+
+**Test the File System**
+
+1. View the newly mounted EFS volume:
+
+```sh
+ls /efs
+```
+
+Nothing will be returned, but that shows that the EFS volume is mounted.
+
+2. List the block devices again:
+
+```sh
+lsblk
+```
+
+Your NFS mount is not yet listed.
+
+3. View the mounts:
+
+```sh
+mount
+```
+
+Toward the bottom, you should see that your NFS share is mounted on `/efs`.
+
+4. View file system mounts:
+
+```sh
+df -h
+```
+
+Again, you should see that your NFS share is mounted on `/efs`.
+
+5. Move all files from `/data` to the `/efs` file system:
+
+```sh
+sudo rsync -rav /data/* /efs
+```
+
+6. View the files now in the `/efs` file system:
+
+```sh
+ls /efs
+```
+
+This time, a list should be returned.
+
+### Remove Old Data
+
+**Remove Data from `webserver-01`**
+
+1. Unmount the partition:
+
+```sh
+sudo umount /data
+```
+
+2. Open the `/etc/fstab` file in an editor:
+
+```sh
+sudo nano /etc/fstab
+```
+
+3. Remove the line starting with `UUID` by placing the cursor at the beginning of the line and pressing **Ctrl+K**.
+
+4. Build a new mount point:
+
+- Navigate back to the **EFS** tab and ensure the **Attach** dialog is still open from the previous objective.
+- Copy the IP address listed in the provided command.
+- Navigate back to the terminal and paste your copied IP address and append `:/`.
+- Press **Tab** twice so your cursor aligns with the `/` on the first line, and then add `/data`.
+- Press **Tab** and then Space once so your cursor aligns with `ext4` on the first line, and then add `nfs4`.
+- Navigate back to the **EFS** tab and copy the options from the command (starting with `nfsvers` and ending with `noresvport`).
+- Navigate back to the terminal and paste your copied options so they align with `defaults, discard` on the first line.
+- Press Tab and then add `0 0` to the end of your mount point entry.
+
+Your mount point should now look like this:
+
+```
+<EFS MOUNT IP>:/ 		/data 	nfs4 	 <OPTIONS> 0 0
+```
+
+5. Press Ctrl+X to exit Nano.
+6. Press **Y** to save your changes and then press **Enter** to write to the file.
+7. Unmount the `/efs` to confirm your edits were successful:
+
+```sh
+sudo umount /efs
+```
+
+<Note>
+  Note: If you receive an error message, wait about a minute and then run the
+  command again.
+</Note>
+
+8. View the file systems:
+
+```sh
+df -h
+```
+
+You should see that you don't have `/data` or `/efs` mounted.
+
+9. Try and mount everything that is not already mounted:
+
+```sh
+sudo mount -a
+```
+
+10. View the file systems again and check if `<EFS MOUNT IP>:/` is mounted:
+
+```sh
+df -h
+```
+
+You should see the NFS share is now mounted on `/data`.
+
+11. View the contents of `/data`:
+
+```sh
+ls /data
+```
+
+You should see `file.01`-`file.10` listed.
+
+**Remove the EBS Volume Attached to `webserver-01`**
+
+1. Navigate back to **EC2** tab showing the Connect to instance page.
+2. Use the breadcrumb along the top of the page to select **EC2**.
+3. In the **Resources** section of the main pane, click **Volumes**.
+4. Scroll to the right and expand the **Attached** resources column to find the 10 GiB volume attached to `webserver-01`.
+5. Click the checkbox next to the 10 GiB volume attached to `webserver-01`.
+6. In the top right, use the **Actions** dropdown to select **Detach volume**.
+7. Click **Detach** to confirm your choice.
+
+When the volume is detached, it will show as **Available**. You may need to refresh the page.
+
+8. After the volume is detached, click the checkbox next to the same volume again.
+9. In the top right, use the Actions dropdown to select **Delete volume**.
+10. Click **Delete** to confirm your choice.
+
+**Remove Data from `webserver-02` and `webserver-03`**
+
+1. In the **EC2** sidebar menu, select **Instances**.
+2. Click the checkbox next to `webserver-02`.
+3. Along the top of the page, click **Connect**.
+4. Click **Connect**.
+
+This should launch a terminal in a new browser window or tab.
+
+5. Navigate to the `webserver-01` terminal and view the contents of `/etc/fstab`:
+
+```sh
+cat /etc/fstab
+```
+
+6. Copy the mount point on the second line (starting with an IP) to your clipboard:
+
+```
+<EFS MOUNT IP>:/ 		/data 	nfs4 	 <OPTIONS> 0 0
+```
+
+7. Navigate back to the terminal you launched for `webserver-02`.
+8. Unmount the `/data` partition:
+
+```sh
+sudo umount /data
+```
+
+9. Open the `/etc/fstab` file in an editor:
+
+```sh
+sudo nano /etc/fstab
+```
+
+10. Edit `/etc/fstab`:
+
+- Remove the line starting with **UUID** by placing the cursor at the beginning of the line and pressing Ctrl+K.
+- Paste in the line from your clipboard and reformat it so it aligns with the line above (it should look the same as in `webserver-01`).
+- Press **Ctrl+X** to exit Nano.
+- Press **Y** to save your changes and then press Enter to write to the file.
+
+11. Mount the partition:
+
+```sh
+sudo mount -a
+```
+
+12. View the file systems:
+
+```sh
+df -h
+```
+
+13. View the contents of `/data`:
+
+```sh
+ls /data
+```
+
+You should see `file.01` through `file.10`, indicating you are using the shared EFS volume.
+
+14. Repeat this entire process for `webserver-03`.
+
+**Remove the EBS Volumes Attached to EC2**
+
+1. Navigate back to the **EC2** tab showing the **Connect to instance** page.
+2. Use the breadcrumb along the top of the page to select **EC2**.
+3. In the **Resources** section, select **Volumes**.
+4. Check the checkboxes for both of the 10 GiB volumes.
+5. Use the **Actions** dropdown to select **Detach volume**.
+6. Type `detach` into the text box to confirm your choice, and then click **Detach**.
+7. After both volumes are detached, select them again using the checkboxes.
+8. Use the **Actions** dropdown to select **Delete volume**.
+9. Type `delete` into the text box to confirm your choice, and then click **Delete**.
+
+## Quiz: EBS abd EFS
+
+<Note>
+Which of the following statements about Amazon Machine Images (AMIs) is true?
+
+Amazon Machine Images are region specific.
+
+You just took a snapshot of an EBS volume. Where is it stored?
+
+S3
+
+What is the purpose of an Amazon Machine Image (AMI)?
+
+It's a template to create a new EC2 instance from.
+
+Which of the following statements about EC2 hibernation is true?
+
+Only certain types of EC2 instances support hibernation.
+
+Which of the following statements about EBS volume encryption is true?
+
+You can create an unencrypted EBS volume from an encrypted snapshot by unselecting the "encryption" checkbox when restoring it.
+
+</Note>
+
+# Chapter 7 - Databases
+
+- [Relational Database Service (RDS) Overview](#relational-database-service-rds-overview)
+- [Increasing Read Performance with Read Replicas](#increasing-read-performance-with-read-replicas)
+- [What is Amazon Aurora](#what-is-amazon-aurora)
+- [DynamoDB Overview](#dynamodb-overview)
+- [When Do We Use DynamoDB Transactions](#when-do-we-use-dynamodb-transactions)
+- [Saving Your Data with DynamoDB Backups](#saving-your-data-with-dynamodb-backups)
+- [Taking Your Data Global with DynamoDB Streams and Global Tables](#saving-your-data-global-with-dynamodb-streams-and-global-tables)
+- [Operating MongoDB-Compatible Databases in Amazon DocumentDB](#operating-mongodb-compatible-databases-in-amazon-documentdb)
+- [Running Apache Cassandra Workloads with Amazon Keyspaces](#running-apache-cassandra-workloads-with-amazon-keypsaces)
+- [Implementing Graph Databases Using Amazon Neptune](#implementing-graph-databases-using-amazon-neptune)
+- [Leveraging Amazon Quantum Ledger Database (Amazon QLDB) for Ledger Databases](#leveraging-amazon-quantum-ledger-database-amazon-qldb-ledger-databases)
+- [Analyzing Time-Series Data with Amazon Timestream](#analyzing-time-series-data-with-amazon-timestream)
+- [Lab: Set Up a WordPress Site Using EC2 and RDS](#lab-set-up-a-wordpress-site-using-ec2-and-rds)
+- [Quiz: Databases](#quiz-databases)
+
+## Relational Database Service (RDS) Overview
+
+### Relational Databases
+
+**Tables**  
+Data is organized into tables. Think of a traditional spreadsheet.
+
+**Rows**  
+The data items.
+
+**Columns**  
+The fields in the database.
+
+**Customer Table Example**:
+
+| Customer_ID | First_Name | Surname  | Address_1             | Address_2 | Zip_Code | Country |
+| :---------- | :--------- | :------- | :-------------------- | :-------- | :------- | :------ |
+| 1           | Jane       | Moore    | 25 Warwick Road       | London    | E1 8AG   | UK      |
+| 2           | Warwick    | Matthews | 5 Leonard Street      | Newcastle | NE6 3KW  | UK      |
+| 3           | Surinder   | Singh    | 247 Orchard Way       | Oxford    | OX5 7JQ  | UK      |
+| 4           | Caroline   | Green    | 1405 Metro Apartments | Toronto   | M4B 1B4  | Canada  |
+| 5           | Michael    | Lee      | Rue de Paradis        | Paris     | 750001   | France  |
+
+**Engines**
+
+- SQL Server
+- Oracle
+- MySQL
+- PostgreSQL
+- MariaDB
+- Amazon Aurora
+
+### RDS Advantages
+
+**Up and Running in Minutes**
+
+- Multi-AZ
+- Failover capability
+- Automated backups
+
+<Note>
+  A manual install in your own data center could take 8 days or longer.
+</Note>
+
+<Tip>
+  RDS is generally used for **online transaction processing (OLTP) workloads.
+</Tip>
+
+### OLTP and OLAP
+
+Understand the difference between **online transaction processing (OLTP)** and **online analytical processing (OLAP)**.
+
+| OLTP                                                                                                                       | OLAP                                                                                                                                  |
+| :------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| Processes data from transactions in real time (e.g. customer orders, banking transactions, payments, and booking systems). | Processes complex queries to analyze historical data (e.g. analyzing net profit figures from the past 3 years and sales forecasting). |
+| OLTP is all about processing and completing large numbers of small transactions in real time.                              | OLAP is all about data analysis using large amounts of data, as well as complex queries that take a long time to complete.            |
+
+**OLAP Transaction Example:**
+
+| Order_ID | Order_Status | First_Name | Surname  | Address_1             | Address_2 | Zip_Code | Country |
+| :------- | :----------- | :--------- | :------- | :-------------------- | :-------- | :------- | :------ |
+| 10004    | Delivered    | Jane       | Moore    | 25 Warwick Road       | London    | E1 8AG   | UK      |
+| 10036    | Delivered    | Warwick    | Matthews | 5 Leonard Street      | Newcastle | NE6 3KW  | UK      |
+| 10009    | Processing   | Surinder   | Singh    | 247 Orchard Way       | Oxford    | OX5 7JQ  | UK      |
+| 10026    | Cancelled    | Caroline   | Green    | 1405 Metro Apartments | Toronto   | M4B 1B4  | Canada  |
+| 10085    | Processing   | Michael    | Lee      | Rue de Paradis        | Paris     | 750001   | France  |
+
+**OLAP Example:**
+
+**Net Profit Analysis**  
+You have been asked to produce a report comparing net profits for car sales in 3 different regions.
+
+**Large Amounts of Data**
+
+- Sum of cars sold in each region.
+- Unit cost for each region.
+- Sales price of each car.
+- Sales price compared to the unit cost.
+
+**Analysis, Not Transactions**  
+RDS is not suitable for analyzing large amounts of data. Use a data warehouse like Redshift, which is optimized for OLAP.
+
+### Multi-AZ
+
+With Multi-AZ, RDS creates an **exact copy** of your production database in another Availability Zone.
+
+![RDS Multi-AZ](../images/rds-multi-az.png)
+
+**AWS handles the replication for you.**
+
+When you write to your production database, this write will automatically synchronize to the standby database.
+
+**Multi-AZ-compatible Engines**
+
+- SQL Server
+- Oracle
+- MySQL
+- PostgreSQL
+- MariaDB
+
+Multi-AZ is for **disaster recovery**, not for improving performance, so you **cannot** connect to the standby when the primary database is **active**.
+
+<Note>
+  **Update**: AWS now offers **Mutli-AZ deployment clusters**, which allow **2
+  readable standby instances**.
+</Note>
+
+### Unplanned Failures and Maintenance
+
+RDS will **automatically fail over** to the standby during a failure so database operations can **resume quickly** without administrative intervention.
+
+### Exam Tips
+
+<Note>
+**RDS Database Types**  
+SQL Server, Oracle, MySQL, PostgreSQL, MariaDB, and Amazon Aurora.
+
+**RDS is for OLTP Workloads**  
+Great for processing lots of small transactions, like customer orders, banking transactions, payments, and booking systems.
+
+**Not Suitable for OLAP Workloads**  
+Use Redshift for data warehousing and OLAP tasks, like analyzing large amounts of data, reporting, and sales forecasting.
+
+</Note>
+
+## Increasing Read Performance with Read Replicas
+
+### What is a Read Replica
+
+- A **read replica** is a read-only copy of your primary database.
+- Great for read-heavy workloads and takes the load off your primary database.
+- A **read replica** can be cross-AZ or **cross-region**.
+- Each **read replica** has its own DNS endpoint.
+- **Read replicas** can be promoted to be their own databases.
+  - This breaks the replication.
+
+### Key Facts
+
+**Scaling Read Performance**  
+Primarily used for scaling, **not** for disaster recovery.
+
+**Requires Automatic Backup**  
+Automatic backups must be enabled in order to deploy a read replica.
+
+**Multiple Read Replicas Are Supported**  
+MySQL, MariaDB, PostgreSQL, Oracle, and SQL Server allow you to add up to 5 read replicas to each DB instance.
+
+### Exam Tips
+
+| Multi-AZ                                                                             | Read Replica                                                                                                                                     |
+| :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| An exact copy of your production database in another Availability Zone.              | A read-only copy fo your primary database in the same AZ, cross-AZ, or cross-region.                                                             |
+| Used for disaster recovery.                                                          | Used to increase or scale read performance.                                                                                                      |
+| In the event of a failure, RDS will automatically fail over to the standby instance. | Great for read-heavy workloads and takes the load off your primary database for read-only workloads (e.g. Business Intelligence reporting jobs). |
+
+## What is Amazon Aurora
+
+### What is Aurora
+
+<Tip>
+  Amazon Aurora is a **MySQL- and PostgreSQL-compatible relational database
+  engine** that combines the speed and availability of high-end commercial
+  databases with the simplicity and cost-effectiveness of open-source databases.
+</Tip>
+
+### Aurora Performance
+
+**5x Performance**  
+Provides **up to 5 times better performance than MySQL** and 3 times better than PostgreSQL databases at a much lower price point, while delivering similar performance and avaiability.
+
+### Basics
+
+- Start with 10 GB. Scales in 10-GB increments to 128 TB (storage Auto Scaling).
+- Compute resources can scale up to 96 vCPUs and 768 GB of memory.
+- 2 copies of your data are contained in each Availability Zone, with a minimum of 3 Availability Zones. 6 copies of your data.
+
+### Scaling
+
+- Aurora is designed to **transparently handle the lost of up to 2 copies of data** without affecting database write availability and up to 3 copies without affecting read availability.
+- Aurora **storage is also self-healing**. Data blocks and disks are continuously scanned for errors and repaired automatically.
+
+### Types of Aurora Replicas
+
+**Aurora Replicas**  
+You can currently have 15 read replicas with Aurora.
+
+**MySQL Replicas**  
+You can currently have 5 read replicas with Aurora MySQL.
+
+**PostgreSQL**  
+You can currently have 5 read replicas with Aurora PostgreSQL.
+
+<Note>
+  **Update:** Aurora MySQL & PostgreSQL replication now supports up to **15**
+  Aurora Replicas.
+</Note>
+
+| Feature                                         | Amazon Aurora Replicas      | MySQL Replicas                         |
+| :---------------------------------------------- | :-------------------------- | :------------------------------------- |
+| Number of replicas                              | Up to 15                    | Up to 5                                |
+| Replication type                                | Asynchronous (milliseconds) | Asynchronous (seconds)                 |
+| Performance impact on primary                   | Low                         | High                                   |
+| Replica location                                | In-region                   | Cross-region                           |
+| Act as failover target                          | Yes (no data loss)          | Yes (potentially minutes of data loss) |
+| Automated failover                              | Yes                         | No                                     |
+| Support for user-defined replication delay      | No                          | Yes                                    |
+| Support for different data or schema vs primary | No                          | Yes                                    |
+
+### Aurora Backups
+
+- Automated backups are always enabled on Amazon Aurora DB Instances. Backups do not impact database performance.
+- You can also take snapshots with Aurora. This also does not impact on performance.
+- You can share Aurora snapshots with other AWS accounts.
+
+### Aurora Serverless
+
+An on-demand, auto-scaling configuration for the MySQL-compatible and PostgreSQL-compatible editions of Amazon Aurora. **An Aurora Serverless DB cluster automatically starts up, shuts down, and scales capacity up or down based on your application's needs**.
+
+### Exam Tips
+
+<Tip>
+  Aurora Serverless provides a **relatively simple, cost-effective option** for
+  infrequent, intermittent, or unpredictable workloads.
+</Tip>
+
+<Note>
+2 copies of your data are contained in each Availability Zone, with a minimum of 3 Availability Zones. 6 copies of your data.
+
+You can share Aurora snapshots with other AWS accounts.
+
+3 types of replicas available: Aurora replicas, MySQL replicas, and PostgreSQL replicas. Automated failover is only available with Aurora replicas.
+
+Aurora has automated backups turned on by default. You can also take snapshots with Aurora. You can share these snapshots with other AWS accounts.
+
+</Note>
+
+## DynamoDB Overview
+
+### What is DynamoDB
+
+- Amazon DynamoDB is a **fast and flexible NoSQL database** service for all applications that need consistent, single-digit millisecond latency at any scale.
+- It is a fully managed database and supports both document and key-value data models.
+- Its flexible data model and reliable performance make it a great fit for mobile, web, gaming, ad-tech, IoT, and many other applications.
+
+### High-Level DynamoDB
+
+- Stored on SSD storage.
+- Spread across 3 geographically distinct data centers.
+- Eventually consistent reads (default).
+- Strongly consistent reads.
+
+### Read Consistency
+
+What's the difference between **eventually consistent reads** and **strongly consistent reads**?
+
+**Eventually**  
+Consistency across all **copies of data is usually reached within a second**. Repeating a read after a short time should return the updated data. Best read performance.
+
+**Strongly**  
+A strongly consistent read **returns a result that reflects all writes** that received a successful response prior to the read.
+
+### DynamoDB Accelerator (DAX)
+
+- Fully managed, highly available, in-memory cache.
+- 10x performance improvement.
+- Reduces request time from milliseconds to **microseconds** - even under load.
+- No need for developers to manage caching logic.
+- Compatible with DynamoDB API calls.
+
+![Dax](../images/dax.png)
+
+### On-Demand Capacity
+
+- **Pay-per-request** pricing.
+- Balance cost and performance.
+- No minimum capacity.
+- **Pay more per request** than with provisioned capacity.
+- Use for new product launches.
+
+### Security
+
+- Encryption at rest using **KMS**.
+- Site-to-site VPN.
+- Direct Connect (DX).
+- IAM policies and roles.
+- Fine-grained access.
+- CloudWatch and CloudTrail.
+- VPC endpoints.
+
+### Exam Tips
+
+<Note>
+Stored on SSD storage.
+
+Spread across 3 geographically distinct data centers.
+
+Eventually consistent reads (default).
+
+Strongly consistent reads.
+
+</Note>
+
+## When Do We Use DynamoDB Transactions
+
+### ACID Diagram
+
+**ACID for Databases**
+
+**ATOMIC**  
+All changes to the data must be performed successfully or not at all.
+
+**Consistent**  
+Data must be in a consistent state before and after the transaction.
+
+**Isolated**  
+No other process can change the data while the transaction is running.
+
+**Durable**  
+The changes made by a transaction must persist.
+
+### ACID with DynamoDB
+
+<Tip>
+**DynamoDB transactions provide developers atomicity, consistency, isolation, and durability (ACID) across 1 or more tables within a single AWS account and region.**
+
+You can use transactions when building applications that require coordinated inserts, deletes, or updates to multiple items as part of a single logical business operation.
+
+</Tip>
+
+### All or Nothing
+
+**All**  
+Transaction succeeds across 1 or more tables.
+
+**Nothing**  
+Transaction fails.
+
+### Use Cases
+
+- Processing financial transactions.
+- Fulfilling and managing orders.
+- Building multiplayer game engines.
+- Coordinating actions across distributed components and services.
+
+### Transactions
+
+- Multiple "all-or-nothing" operations.
+- Financial transactions.
+- Fulfilling orders.
+- 3 options for reads: eventual consistency, strong consistency, and transactional.
+- 2 options for writes: standard and transactional.
+- Up to 25 items or 4 MB of data.
+
+### Exam Tips
+
+<Note>
+If you see any scenario question that mentions ACID requirements, think **DynamoDB transactions**.
+
+DynamoDB transactions provides developers **atomicity, consistency, isolation, and durability** (ACID) across 1 or more tables within a single AWS account and region.
+
+**All-or-nothing** transactions.
+
+</Note>
