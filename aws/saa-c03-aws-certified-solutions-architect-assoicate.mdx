@@ -3848,3 +3848,370 @@ DynamoDB transactions provides developers **atomicity, consistency, isolation, a
 **All-or-nothing** transactions.
 
 </Note>
+
+## Saving Your Data with DynamoDB Backups
+
+### On-Demand Backup and Restore
+
+- Full backups at any time.
+- Zero impact on table performance or availability.
+- Consistent within seconds and **retained until deleted**.
+- Operates within same region as the source table.
+
+### Point-in-Time Recovery (PITR)
+
+- Protects against accidental writes or deletes.
+- Restore to any point in the last **35 days**.
+- Incremental backups.
+- Not enabled by default.
+- Latest restorable: **5 minutes** in the past.
+
+## Taking Your Data Global with DynamoDB Streams and Global Tables
+
+### Streams
+
+- Time-ordered sequence of item-level changes in a table.
+- Stored for **24 hours**.
+- Inserts, updates, and deletes.
+- Combine with Lambda Functions for functionality like stored procedures.
+
+![streams](../images/streams.png)
+
+### Global Tables
+
+**Managed Multi-Master, Multi-Region Replication**
+
+- Globally distributed applications.
+- Based on DynamoDB streams.
+- Multi-region redundancy for disaster recovery or high availability.
+- No application rewrites.
+- Replication latency under **1 second**.
+
+### Exam Tips
+
+<Note>
+Globally distributed applications.
+
+Based on DynamoDB streams.
+
+Multi-region redundancy for disaster recovery or high availability.
+
+No application rewrites.
+
+Replication latency under **1 second**.
+
+</Note>
+
+## Operating MongoDB-Compatible Databases in Amazon DocumentDB
+
+### What is MongoDB
+
+MongoDB is a document database that allows for scalability and flexibility with your data as well as robust querying and indexing features.
+
+### Example
+
+Document database for two restaurants.
+
+```js
+export async function insertDocuments(db) {
+  // Get the documents collection
+  const collection = db.collection("restaurants");
+
+  // Insert some documents
+  const result = await collection.insertMany([
+    {
+      name: "Sun Bakery Trattoria",
+      stars: 4,
+      categories: ["Pizza", "Pasta", "Italian", "Coffee", "Sandwiches"],
+    },
+    {
+      name: "Blue Bagels Grill",
+      stars: 3,
+      categories: ["Bagles", "Cookies", "Sandwiches"],
+    },
+  ]);
+}
+```
+
+### What is Amazon DocumentDB
+
+Allows you to run MongoDB on the AWS cloud. It's a managed database service that scales with your workloads and safely and durably stores your database information.
+
+### Why Use It
+
+You no longer have to worry about all the manual tasks when running MongoDB workloads, such as cluster management software, configuring backups, or monitoring production workloads.
+
+### Exam Tips
+
+<Note>
+A typical question might be about moving your MongoDB database to AWS.
+
+MongoDB On-Premises
+
+AWS Database Migration Service
+
+Amazon DocumentDB
+
+For scenario questions where they talk about migrating MongoDB from on-premises to AWS, **think Amazon DocumentDB**.
+
+</Note>
+
+## Running Apache Cassandra Workloads with Amazon Keyspaces
+
+### What is Cassandra
+
+A distributed database (i.e. it runs on many machines) that uses NoSQL. It's primarily used for big data solutions. Enterprises, such as Netflix, use Cassandra on their backend.
+
+### What is Keyspaces
+
+Amazon's Apache Cassandra database service. It allows you to run Cassandra workloads on AWS and is a fully managed database service.
+
+### Why Use It
+
+- It's a fully managed database service - you don't need to worry about managing servers, software, patching, etc.
+- **Keyspaces is serverless**.
+- You pay for only the resources you use, and the service can automatically scale tables up and down in response to your applications.
+
+### Exam Tips
+
+<Note>
+  If you see a scenario question about migrating a big data Cassandra cluster to
+  AWS, **think of Amazon Keyspaces**!
+</Note>
+
+## Implementing Graph Databases Using Amazon Neptune
+
+### What Is a Graph Database
+
+- Data is stored just like you might sketch ideas on a whiteboard.
+- A graph database stores nodes and relationships instead of tables and documents.
+
+### Neptune
+
+Neptune is a fast, reliable, fully managed graph database service that makes it easy to build and run applications.
+
+### Use Cases
+
+**Build Connections between Identities**  
+Easily build identity graphs for identity resolution solutions such as social graphs, and accelerate updates for ad targeting, personalization, and analytics.
+
+**Build Knowledge Graph Applications**  
+Add topical data to product catalogs, model general information, and help users quickly navigate highly connected databases.
+
+**Detect Fraud Patterns**  
+Build graph queries for near real-time identity fraud pattern detection in financial and purchase transactions.
+
+**Security Graphs to Improve IT Security**  
+Proactively detect and investigate IT infrastructure using a layered security approach. Visualize all infrastructure to plan, predict, and mitigate risk.
+
+### Exam Tips
+
+<Note>
+**Neptune is often used as a distractor.**
+
+If the scenario is **not** talking about graph databases, **do not** select Neptune as an answer. You only need to know what Neptune does at a very high level.
+
+</Note>
+
+## Leveraging Amazon Quantum Ledger Database (Amazon QLDB) for Ledger Databases
+
+### What is a Ledger Database
+
+It's a NoSQL database that is immutable, transparent, and has a cryptographically verifiable transaction log that is owned by one authority.
+
+**You cannot update a record (i.e. replace old content) in a ledger database. Instead, an update adds a new record to the database.**
+
+- It's used for cryptocurrencies, such as Bitcoin, Ethereum, etc.
+- Shipping companies use it to track items, boxes, shipping containers, deliveries, etc.
+- Pharmaceutical companies use it to track creation and distribution of drugs and ensure no counterfeits are produced.
+
+### Amazon Quantum Ledger Database (QLDB)
+
+A fully managed ledger database that provides a transparent, immutable, and cryptographically verifiable transaction log.
+
+### QLDB Use Cases
+
+**Store Financial Transactions**  
+Create a complete and accurate record of all financial transactions, such as credit and debit transactions.
+
+**Reconcile Supply Chain Systems**  
+Record the history of each transaction, and provide details of every batch manufactures, shipped, stored, and sold from facility to store.
+
+**Maintains Claims History**  
+Track a claim over its lifetime, and cryptographically verify data integrity to make the application resilient against data entry errors and manipulation.
+
+**Centralize Digital Records**  
+Implement a system-of-record application to create a complete, centralized record of employee details, such as payroll, bonus, and benefits.
+
+### Exam Tips
+
+<Note>
+**QLDB is often used as a distractor.**
+
+If the scenario is not talking about immutable databases, do not select Amazon QLDB as an answer. You need to know what QLDB does only at a very high level.
+
+</Note>
+
+## Analyzing Time-Series Data with Amazon Timestream
+
+### Time-Series Data
+
+Data points that are logged over a series of time, allowing you to track your data. Examples could be temperature readings from weather stations around the world, on the hour, every hour for years.
+
+### Time-Series Data Examples
+
+**IoT**  
+IoT sensors relay thousands, millions, and billions of points of information depending on the setup. One use case is for agriculture.
+
+**Analytics**  
+Large websites such as Netflix server millions of users per second. Need to analyze incoming and outgoing web traffic.
+
+**DevOps Applications**  
+Applications that change in response to users needs may need to be monitored continuously so they can scale correctly.
+
+### Amazon Timestream
+
+A serverless, fully managed database service for time-series data. You can analyze **trillions** of events per day up to **1000 times faster** and at as little as **1/10th the cost** of traditional relational databases.
+
+### Exam Tips
+
+<Note>
+  If you see a scenario question about where to store a large amount of
+  time-series data for analysis, **think of Timestream**.
+</Note>
+
+## Lab: Set Up a WordPress Site Using EC2 and RDS
+
+### Create RDS Database
+
+1. In the AWS management console, enter **"rds"** into the search bar on top.
+2. From the results, select **RDS**.
+3. Click **Create database**.
+4. On the Create database page, set the following parameters:
+
+- Select **Standard create**.
+- Under Engine options, select **MySQL**.
+- Under **Templates**, select **Free Tier**.
+- Under **DB instance identifier**, enter **"wordpress"** and copy this into your clipboard.
+- Paste in **"wordpress"** as the **Master username**.
+- Under **Credentials management**, select **Self managed**.
+- Paste in **"wordpress"** in the **Master password** and **Confirm master password** fields.
+- Under Instance configuration, select **Burstable classes** and make sure the class is `db.t3.micro*`.
+- Under **VPC security group**, ensure **Choose existing**.
+- Under Existing **VPC security group**, select the **non-default security group** from the dropdown menu and remove the default security group.
+- Under Availability zone, select `us-east-1a`.
+- Expand Additional configuration and, under Initial database name, enter **"wordpress"**.
+- Click **Create database**.
+
+5. While the database is created, enter **"ec2"** in the search bar on top.
+6. From the results, right-click **EC2** and open it in a new browser window or tab.
+7. Under **Resources**, click **Instances (running)**.
+8. Click the checkbox next to `webserver-01`.
+9. In the top right, click **Connect**.
+10. Click **Connect**.
+
+### Install Apache and Dependencies
+
+1. In the terminal, install the Apache 2 web server, libraries, PHP, and PHP MySQL:
+
+```sh
+sudo apt install apache2 libapache2-mod-php php-mysql
+```
+
+2. When prompted, press **Y** for yes and press **Enter**.
+3. Go into the newly created `/var/www` directory:
+
+```sh
+cd /var/www/
+```
+
+4. View the contents of the directory:
+
+```sh
+ls
+```
+
+5. Put wordpress into its own folder in the `/var/www` directory that we're currently in:
+
+```sh
+sudo mv /wordpress .
+```
+
+6. View the contents of the directory:
+
+```sh
+ls
+```
+
+7. Move into the wordpress directory:
+
+```sh
+cd wordpress
+```
+
+8. View the contents of the directory:
+
+```sh
+ls
+```
+
+9. Move the Apache configuration file into `/etc/apache2/sites-enabled/` to enable the WordPress website to work from `/var/www/wordpress`:
+
+```sh
+sudo mv 000-default.conf /etc/apache2/sites-enabled/
+```
+
+10. Restart the Apache 2 configuration:
+
+```sh
+sudo apache2ctl restart
+```
+
+### Configure WordPress
+
+1. Open the WordPress config PHP file for editing:
+
+```sh
+sudo nano wp-config.php
+```
+
+2. Return to the browser window or tab that has the RDS Databases open.
+3. Click the **wordpress** database.
+4. In the **Connectivity & security** tab, under **Endpoint**, copy the endpoint provided into your clipboard.
+5. Return to your terminal. Change the line `define('DB_HOST', 'localhost');` to read:
+
+```sh
+define('DB_HOST', '<INSERT ENDPOINT HERE>');
+```
+
+6. Save and exit by pressing **Control + X**, followed by **Y**, and pressing **Enter**.
+
+### Modify Security Groups
+
+1. Return to your browser window or tab with the EC2 Connect to instance page open.
+2. In the left-hand navigation menu, under **Networks & Security**, click **Security Groups**.
+3. Click the checkmark next to the non-default security group among those provided in the lab.
+4. Click the **Inbound rules** tab.
+5. Click the **Edit inbound rules** button.
+6. Click the **Add rule** button.
+7. For the new rule, from the Type dropdown menu, select **MYSQL/Aurora**.
+8. In the dropdown menu to the right of the **Source** column for the new rule, find and select the non-default security group.
+9. Click **Save rules**.
+
+### Complete Wordpress Installation and Test
+
+1. Return to the terminal.
+2. At the bottom of the screen on the white bar, right-click the public IP now being shown after PublicIPs.
+3. Click Go to followed by the IP address, or copy the IP address, open a new browser window or tab, and paste it there.
+4. On the WordPress installation page, enter in the following information for each field:
+
+- Site Title: **"A Cloud Guru"**
+- Username: **"guru"**
+- Password: Select a strong password to use here, and make sure to copy it in your clipboard for later.
+- Your Email: **"test@example.com"**
+
+5. Click **Install WordPress**.
+6. Click **Log in**.
+7. Enter **"guru"** for the Username or email and paste in the password that you copied earlier.
+8. To view the website you just created, click **A Cloud Guru** in the top left corner of the page.
+9. Click **Visit Site** to visit your newly created WordPress site.
