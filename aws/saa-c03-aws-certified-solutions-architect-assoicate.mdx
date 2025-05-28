@@ -13,7 +13,7 @@ icon: ""
 - [Chapter 5 - Elastic Cloud Compute EC2](#chapter-5---elastic-cloud-compute-ec2)
 - [Chapter 6 - Elastic Block Storage EBS and Elastic File System EFS](#chapter-6---elastic-block-storage-ebs-and-elastic-file-system-efs)
 - [Chapter 7 - Databases](#chapter-7---databases)
-- [Chapter 8 - Virtual Private Cloud VPC Networking](#chapter-8---virtual-private-cloud-vpc-networking)
+- [Chapter 8 - Virtual Private Cloud (VPC) Networking](#chapter-8---virtual-private-cloud-vpc-networking)
 - [Chapter 9 - Route 53](#chapter-9---route-53)
 - [Chapter 10 - Elastic Load Balancing ELB](#chapter-10---elastic-load-balancing-elb)
 - [Chapter 11 - Monitoring](#chapter-11---monitoring)
@@ -4215,3 +4215,118 @@ define('DB_HOST', '<INSERT ENDPOINT HERE>');
 7. Enter **"guru"** for the Username or email and paste in the password that you copied earlier.
 8. To view the website you just created, click **A Cloud Guru** in the top left corner of the page.
 9. Click **Visit Site** to visit your newly created WordPress site.
+
+## Quiz: Databases
+
+<Note>
+Which of the following is the correct description of Amazon Timestream?
+
+A serverless, fully managed database service for time series data.
+
+What should you do to scale out an RDS database that has a read-heavy workload.
+
+Add additional read replicas.
+
+Which of the following about Amazon RDS DB Instances is true?
+
+Amazon VPC enables you to launch Amazon RDS DB instances into a virtual private cloud (VPC).
+
+Which of the following statements about DynamoDB is false?
+
+DynamoDB is a fully managed SQL database service.
+
+Which AWS database service would you use to run Apache Cassandra workloads on AWS?
+
+Amazon Keyspaces.
+
+</Note>
+
+# Chapter 8 - Virtual Private Cloud (VPC) Networking
+
+- [VPC Overview](#vpc-overview)
+- [Using NAT Gateways for Internet Access](#using-nat-gateways-for-internet-access)
+- [Protecting your Resources with Security Groups](#protecting-your-resources-with-security-groups)
+- [Controlling Subnet Traffic with Network ACLs](#controlling-subnet-traffic-with-network-acls)
+- [Private Communication Using VPC Endpoints](#private-communication-using-vpc-endpoints)
+- [Network Privacy with AWS PrivateLink](#network-privacy-with-aws-privatelink)
+- [Building Solutions Across VPCs with Peering](#building-solutions-across-vpcs-with-peering)
+- [Securing your Network with VPN CloudHub](#securing-your-network-with-vpn-cloudhub)
+- [Connecting On-Premises with Direct Connect](#connecting-on-premises-with-direct-connect)
+- [Simplifying Networks with Transit Gateway](#simplifying-networks-with-transit-gateway)
+- [5G Networking with AWS Wavelength](#5g-networking-with-aws-wavelength)
+- [Lab: Build Solutions across VPCs with Peering](#lab-build-solutions-across-vpcs-with-peering)
+- [Quiz: Virtual Private Cloud (VPC) Networking](#quiz-virtual-private-cloud-vpc-networking)
+
+## VPC Overview
+
+### Introduction
+
+Think of a VPC as a virtual data center in the cloud.
+
+- Logically isolated part of the AWS Cloud where you can define your own network.
+- Complete control of virtual network, including your own IP address range, subnets, route tables, and network gateways.
+
+### Networking
+
+You can leverage multiple layers of security, including security groups and network access control lists, to help control access to Amazon EC2 instances in each subnet.
+
+**Web**  
+Public-facing subnet.
+
+**Application**  
+Private subnet. Can only speak to web tier and database tier.
+
+**Database**  
+Private subnet. Can only speak to application tier.
+
+### VPNs
+
+Additionally, you can create a **hardware Virtual Private Network (VPN)** connection between your corporate data center and your VPC and leverage the AWS Cloud as an extension of your corporate data center.
+
+### Network Diagram
+
+![VPC Diagram](../images/vpc-diagram.png)
+
+### VPC Features
+
+**Launch Instances**  
+Launch instances into a subnet of your choosing.
+
+**Custom IP Addresses**  
+Assign custom IP address ranges in each subnet.
+
+**Route Tables**  
+Configure route tables between subnets.
+
+**Intenet Gateway**  
+Create internet gateway and attach it to your VPC.
+
+**More Control**  
+Much better security control over your AWS resources.
+
+**Access Control Lists**  
+Subnet network access control lists.
+
+<Tip>
+  You can use network access control lists (NACLs) to block specific IP
+  addresses.
+</Tip>
+
+### Comparing VPCs
+
+| Default                                                      | Custom                |
+| :----------------------------------------------------------- | :-------------------- |
+| Default VPC is user friendly.                                | Fully customizable.   |
+| All subnets in default VPC have a route out to the internet. | Takes time to set up. |
+| Each EC2 instance has both a public and private IP address.  |                       |
+
+### Exam Tips
+
+<Note>
+Think of a VPC as a logical data center in AWS.
+
+Consists of internet gateways (or virtual private gateways), route tables, network access control lists, subnets, and security groups.
+
+1 subnet is always in 1 Availability Zone.
+
+</Note>
