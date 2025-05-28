@@ -4244,6 +4244,7 @@ Amazon Keyspaces.
 # Chapter 8 - Virtual Private Cloud (VPC) Networking
 
 - [VPC Overview](#vpc-overview)
+- [Demo: Provisioning a VPC](#demo-provisioning-a-vpc)
 - [Using NAT Gateways for Internet Access](#using-nat-gateways-for-internet-access)
 - [Protecting your Resources with Security Groups](#protecting-your-resources-with-security-groups)
 - [Controlling Subnet Traffic with Network ACLs](#controlling-subnet-traffic-with-network-acls)
@@ -4327,6 +4328,366 @@ Think of a VPC as a logical data center in AWS.
 
 Consists of internet gateways (or virtual private gateways), route tables, network access control lists, subnets, and security groups.
 
-1 subnet is always in 1 Availability Zone.
+1 subnet is always in 1 Availability Zone. A subnet cannot span over more than 1 Availability Zone.
+
+</Note>
+
+## Demo: Provisioning a VPC
+
+<Tip>
+  It's a good practice to follow the following naming convention for subnets:
+  `x.x.x.x/x-availability-zone`.
+</Tip>
+
+- `x.x.x.0` - network address.
+- `x.x.x.1` - reserved by AWS for the VPC router.
+- `x.x.x.2` - reserved by AWS. The IP address of the DNS server is the base of the VPC network range plus 2. For VPCs with multiple CIDR blocks, the IP address of the DNS server is located in the primary CIDR.
+- `x.x.x.3` - reserved by AWS for future use.
+- `x.x.x.255` - network broadcast address. AWS does not support broadcast in a VPC, there it is reserved.
+
+## Using NAT Gateways for Internet Access
+
+### What is a NAT Gateway
+
+You can use Network Address Translation (NAT) to **enable instances in a private subnet** to connect to the internet or other AWS services while preventing the internet from initiating a connection with those instances.
+
+### Network Diagram
+
+![NAT Gateway](../images/nat-gw.png)
+
+<Tip>
+  A NAT Gateway is essentially a collection of EC2 instances behind the scenes
+  that AWS handles.
+</Tip>
+
+### Exam Tips
+
+<Note>
+Redundant inside the Availability Zone.
+
+Starts at 5 Gbps and scales currently to 45 Gbps.
+
+No need to patch.
+
+Not associated with security groups.
+
+Automatically assigned a public IP address.
+
+</Note>
+
+## Protecting your Resources with Security Groups
+
+### Review of Security Groups
+
+**Light**  
+We see light using our **eyes**.
+
+**Soound**  
+We hear sound using our **ears**.
+
+**Heat**  
+We feel heat using our **skin**.
+
+**How Computers Communicate**
+
+| Linux   | Windows   | HTTP             | HTTPS                            |
+| :------ | :-------- | :--------------- | :------------------------------- |
+| **SSH** | **RDP**   | **Web Browsing** | **Encrypted Web Browsing (SSL)** |
+| Port 22 | Port 3389 | Port 80          | Port 443                         |
+
+### Network Diagram
+
+![Security Groups](../images/security-groups.png)
+
+In terms of troubleshooting connectivity, start with:
+
+- Route Tables
+- Network Access Control Lists (NACLs)
+- Security Groups
+
+### What are Security Groups
+
+Are **virtual firewalls for an EC2 instance**. By default, everything is blocked.
+
+To let everything in: `0.0.0.0/0`.
+
+<Tip>
+  In order to **communicate to your EC2 instances via SSH, RDP, or HTTP**, you
+  will need to **open up the correct port**.
+</Tip>
+
+### Exam Tips
+
+<Note>
+  Security groups are stateful - if you send a request from your instance, the
+  response traffic for that request is allowed to flow in regardless of inbound
+  security group rules.
+
+Responses to allowed inbound traffic are allowed to flow out, regardless of outbound rules.
+
+</Note>
+
+## Controlling Subnet Traffic with Network ACLs
+
+### What is a Network ACL
+
+- A network access control list (ACL) is an optional layer of security for your VPC that acts as a firewall for controlling traffic in and out of one or more subnets.
+- You might setup network ACLs with rules similar to your security groups in order to add another layer of security to your VPC.
+
+### Network Diagram
+
+![Network ACLs](../images/network-acls.png)
+
+### Overview
+
+- **Default Network ACLs:** Your VPC automatically comes with a default network ACL, and by default it allows all outbound and inbound traffic.
+- **Custom Network ACLs:** You can create custom network ACLs. By default, each custom network ACL denies all inbound and outbound traffic until you add rules.
+- **Subnet Associations:** Each subnet in your VPC must be associated with a network ACL. If you don't explicitly associate a subnet with a network ACL, the subnet is automatically associated with the default network ACL.
+- **Block IP Addresses:** Block IP addresse using network ACLs, not security groups.
+
+### Network ACL Tips
+
+- You can associate a network ACL with multiple subnet; however, a subnet can be associated with **only 1 network ACL** at a time. When you associate a network ACL with a subnet, the previous association is **removed**.
+- Network ACLs contain a **numbered list of rules** that are evaluated in order, starting with the **lowest** numbered rule.
+  - Best practice is to always start with `100`.
+- Network ACLs have **separate** inbound and outbound rules, and each rule can either **allow or deny traffic**.
+- Network ACLs are **stateless**; response to allows inbound traffic are subject to the rules for outbound traffic (and vice versa).
+
+### Exam Tips
+
+<Note>
+**Default Network ACLs:** Your VPC automatically comes with a default network ACL, and by default it allows all outbound and inbound traffic.
+
+**Custom Network ACLs:** You can create custom network ACLs. By default, each custom network ACL denies all inbound and outbound traffic until you add rules.
+
+**Subnet Associations:** Each subnet in your VPC must be associated with a network ACL. If you don't explicitly associate a subnet with a network ACL, the subnet is automatically associated with the default network ACL.
+
+**Block IP Addresses:** Block IP addresse using network ACLs, not security groups.
+
+You can associate a network ACL with multiple subnet; however, a subnet can be associated with **only 1 network ACL** at a time. When you associate a network ACL with a subnet, the previous association is **removed**.
+
+Network ACLs contain a **numbered list of rules** that are evaluated in order, starting with the **lowest** numbered rule - best practice is to always start with `100`.
+
+Network ACLs have **separate** inbound and outbound rules, and each rule can either **allow or deny traffic**.
+
+Network ACLs are **stateless**; response to allows inbound traffic are subject to the rules for outbound traffic (and vice versa).
+
+</Note>
+
+## Private Communication Using VPC Endpoints
+
+### What are VPC Endpoints
+
+Enable you to privately connect your VPC to supported AWS services and VPC endpoint services powered by PrivateLink without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
+
+Traffic between your VPC and the other service **does not leave the Amazon network**.
+
+<Tip>
+Instances in your VPC not required public IP addresses to communicate with
+resources in the service.
+
+**Endpoints are Virtual Devices:** They are horizontally scaled, redundant, and highly available VPC components that allow communication between instances in your VPC and services **without imposing availability risks or badnwidth constraints on your network traffic**.
+
+</Tip>
+
+### VPC Endpoint Types
+
+| Interface Endpoints                                                                                                                                                                                       | Gateway Endpoints                                                                                                             |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| An interface endpoint is an **elastic network interface with a private IP address** that serves as an entry point for traffic headed to a supported service. They support a large number of AWS services. | Similar to NAT gateways, a gateway endpoint is a **virtual device you provision**. It supports connection to S3 and DynamoDB. |
+
+### VPC Endpoints in Action
+
+![VPC Endpoints](../images/vpc-endpoints.png)
+
+### Exam Tips
+
+<Note>
+**Use Case:** When you want to connect AWS services without leaving the Amazon internal network.
+
+**2 Types of VPC Endpoints:** Interface endpoints and gateway endpoints.
+
+**Gateway Endpoints:** Support S3 and DynamoDB.
+
+</Note>
+
+## Building Solutions Across VPCs with Peering
+
+### Multiple VPCs
+
+Sometimes you may need to have several VPCs for different environments, and it may be necessary to connect these VPCs to each other.
+
+- Production Web VPC
+- Content VPC
+- Intranet
+
+### VPC Peering
+
+- Allows you to connect 1 VPC with another via a direct network route using private IP addresses.
+- Instances behave as if they were on the same private network.
+- You can peer VPCs with other AWS accounts as well as with other VPCs in the same account.
+- Peering is in a star configuration (e.g. 1 central VPC peers with 4 others). No transitive peering.
+- You can peer between regions.
+
+### Transitive Peering
+
+A VPC cannot communicate with another VPC via a mutual "middle man" VPC. A new peering connection has to be established.
+
+![Transitive Peering](../images/transitive-peering.png)
+
+### Exam Tips
+
+<Note>
+**Allows you to connect** 1 VPC with another via a direct network route using private IP addresses.
+
+**Transitive peering is not supported.** This must always be in a hub-and-spoke model.
+
+**You can peer between regions.**
+
+**No overlapping CIDR address ranges.**
+
+</Note>
+
+## Network Privacy with AWS PrivateLink
+
+### Opening Your Services in a VPC to Another VPC
+
+![Opening Services to VPCs](../images/opening-services-to-vpcs.png)
+
+### Sharing Applications across VPCs
+
+**Open the VPC up to the Internet**
+
+- Security considerations; everything in the public subnet is public.
+- A lot more to manage.
+
+**Use VPC Peering**
+
+- You will have to create and manage many different peering relationships.
+- The whole network will be accessible. This isn't good if you have multiple applications within your VPC.
+
+<Note>
+  **Note:** the whole network will be accssible via VPC peering if you
+  explicitly allow all traffic within security groups and NACLs from the peered
+  VPC.
+</Note>
+
+### Using PrivateLink
+
+- The best way to expose a service VPC to tens, hundreds, or thousands of customer VPCs.
+- Doesn't require VPC peering; no route tables, NAT gateways, internet gateways, etc.
+- Requires a Network Load Balancer on the service VPC and an ENI on the customer VPC.
+
+![PrivateLink](../images/privatelink.png)
+
+### Exam Tips
+
+<Note>
+If you see a question asking about peering VPCs to tens, hundreds, or thousands of customer VPCs, think of AWS PrivateLink.
+
+Doesn't require VPC peering; no route tables, NAT gateways, internet gateways, etc.
+
+Requires a Network Load Balancer on the service VPC and an ENI on the customer VPC.
+
+</Note>
+
+## Securing your Network with VPN CloudHub
+
+### VPN CloudHub
+
+If you have multiple sites, each with its own VPN connection, you can use AWS VPN CloudHub to connect those sites together.
+
+- Hub-and-spoke model.
+- Low cost and easy to manage.
+- It operates over the public internet, but all traffic between customer gateway and the AWS VPN CloudHub is encrypted.
+
+### Network Diagram
+
+![VPN CloudHub](../images/vpn-cloudhub.png)
+
+### Exam Tips
+
+<Note>
+If you have multiple sites, each with its own VPN connection, you can use AWS VPN CloudHub to connect those sites together.
+
+AWS VPN CloudHub operates over the public internet, but all traffic between customer gateway and the AWS VPN CloudHub is encrypted.
+
+</Note>
+
+## Connecting On-Premises with Direct Connect
+
+### Direct Connect
+
+AWS Direct Connect is a cloud service solution that **makes it easy to establish a dedicated network connection** from your premises to AWS.
+
+### Private Connectivity
+
+Using AWS Direct Connect, you can establish private connectivity between AWS and your data center or office.
+
+<Tip>
+  In many cases, you can reduce your network costs, increase bandwidth
+  throughput, and provide a more consistent network experience than
+  internet-based connections.
+</Tip>
+
+### Types of Connection
+
+| Dedicated Connection                                                                                                                                                    | Hosted Connection                                                                                                                                                                                                                             |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A physcial Ethernet connection associated with a single customer. Customers can request a dedicated connection through AWS Direct Connect console, the CLI, or the API. | A physical Ethernet connection that an AWS Direct Connect Partner provisions on behalf of a customer. Customers request a hosted connection by contacting a partner in the AWS Direct Connect Partner Program, who provisions the connection. |
+
+### Direct Connect in Action
+
+![Direct Connect](../images/direct-connect.png)
+
+### VPNs vs Direct Connect
+
+VPNs allow private communication, but it still traverses the public internet to get the data delivered. While secure, it can be painfully slow.
+
+- Fast.
+- Secure.
+- Reliable.
+- Able to take massive throughput.
+
+### Exam Tips
+
+<Note>
+Direct Connect directly connects your data center to AWS.
+
+Useful for high-throughout workloads (e.g. lots of network traffic).
+
+Helpful when you need a stable and reliable secure connection.
+
+</Note>
+
+## Simplifying Networks with Transit Gateway
+
+### Network Architecture Diagram
+
+![Transit Gateway](../images/transit-gateway.png)
+
+### Transit Gateway
+
+Connects VPCs and on-premises networks through a central hub. This simplifies your network and puts an end to complex peering relationships. It acts as a cloud router - each new connection is only made once.
+
+### Simplify Your Network Topology
+
+![network-topology-simplified](../images/network-topology-simplified.png)
+
+### Transit Gateway Facts
+
+- Allows you to have transitive peering between thousands of VPCs and on-premises data centers.
+- Works on a hub-and-spoke model.
+- Works on a regional basis, but you can have to across multiple regions.
+- You can use it across multiple AWS accounts using RAM (Resource Access Manager).
+
+### Exam Tips
+
+<Note>
+You can use route tables to limit how VPCs talk to one another.
+
+Works with Direct Connect as well as VPN connections.
+
+Supports IP multicast (not supported by any other AWS service).
 
 </Note>
