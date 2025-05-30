@@ -36,7 +36,7 @@ icon: ""
 - [Shared Responsibility Model](#shared-responsibility-model)
 - [Compute, Storage, Databases, and Networking](#compute-storage-databases-and-networking)
 - [The Well-Architected Framework](#the-well-architected-framework)
-- [Quiz: Availability Zones and Regions](#quiz-availability-zones-and-regions)
+- [Quiz - Availability Zones and Regions](#quiz---availability-zones-and-regions)
 
 ## Availability Zones and Regions
 
@@ -204,7 +204,7 @@ Minimizing the environmental impacts of running cloud workloads.
 
 <Note>**Read the Whitepaper.**</Note>
 
-## Quiz: Availability Zones and Regions
+## Quiz - Availability Zones and Regions
 
 <Note>
 **Which statement best describes an Availability Zone?**
@@ -234,7 +234,7 @@ Networking.
 - [Securing the Root Account](#securing-the-root-account)
 - [IAM Policy Documents](#iam-policy-documents)
 - [Permanent IAM Credentials](#permanent-iam-credentials)
-- [Quiz: Identity and Access Management](#quiz-identity-and-access-management)
+- [Quiz - Identity and Access Management](#quiz---identity-and-access-management)
 
 ## Securing the Root Account
 
@@ -331,7 +331,7 @@ Allow you to connect IAM to external identity providers like **Azure AD**, under
 
 </Note>
 
-### Lab: Create & Assume Roles
+### Lab - Create & Assume Roles
 
 **Create the `S3RestrictPolicy` IAM Polciy**
 
@@ -414,7 +414,7 @@ Allow you to connect IAM to external identity providers like **Azure AD**, under
   back.
 </Note>
 
-### Quiz: Identity and Access Management
+### Quiz - Identity and Access Management
 
 <Note>
 What does the "EAR" in a policy document stand for?
@@ -451,10 +451,10 @@ Why is it dangerous to use the AWS root user account?
 - [Encrypting S3 Objects](#encrypting-s3-objects)
 - [Optimizing S3 Performance](#optimizing-s3-performance)
 - [Backing up Data with S3](#backing-up-data-with-s3)
-- [Lab: Set Up Cross-Region Bucket Replication](#lab-set-up-cross-region-bucket-replication)
-- [Lab: Creating a Static Website Using S3](#lab-creating-a-static-website-with-s3)
-- [Lab: Creating S3 Buckets, Managing Objects, and Enabling Versioning](#lab-creating-s3-buckets-managing-objects-and-enabling-versioning)
-- [Quiz: Simple Storage Service S3](#quiz-simple-storage-service-s3)
+- [Lab - Set Up Cross-Region Bucket Replication](#lab---set-up-cross-region-bucket-replication)
+- [Lab - Creating a Static Website Using S3](#lab---creating-a-static-website-with-s3)
+- [Lab - Creating S3 Buckets, Managing Objects, and Enabling Versioning](#lab---creating-s3-buckets-managing-objects-and-enabling-versioning)
+- [Quiz - Simple Storage Service S3](#quiz---simple-storage-service-s3)
 
 ## S3 Overview
 
@@ -984,7 +984,7 @@ Delete markers are **not replicated by default**.
 
 </Note>
 
-## Lab: Set Up Cross-Region Bucket Replication
+## Lab - Set Up Cross-Region Bucket Replication
 
 ### Create an S3 Bucket and Enable Replication
 
@@ -1029,7 +1029,7 @@ Delete markers are **not replicated by default**.
   there yet, refresh and wait a minute or two for it to appear.
 </Note>
 
-## Lab: Creating a Static Website Using S3
+## Lab - Creating a Static Website Using S3
 
 ### Create S3 Bucket
 
@@ -1111,7 +1111,7 @@ Delete markers are **not replicated by default**.
 - Refresh the browser tab with the static website (the endpoint URL you opened earlier). This time, the site should load correctly.
 - Add a `/` at the end of the URL and some random letters (anything that's knowingly an error). This will display your `error.html` page.
 
-## Lab: Creating S3 Buckets, Managing Objects, and Enabling Versioning
+## Lab - Creating S3 Buckets, Managing Objects, and Enabling Versioning
 
 ### Create a Public and Private Amazon S3 Bucket
 
@@ -1194,7 +1194,7 @@ Delete markers are **not replicated by default**.
 - Click the **null** object.
 - Open its **Object URL** in a new browser tab. You should see the original `cat1.jpg` image you uploaded.
 
-## Quiz: Simple Storage Service S3
+## Quiz - Simple Storage Service S3
 
 <Note>
 Which of the following statements is true?
@@ -1232,9 +1232,9 @@ Since S3 is an object-based storage solution, which type of file should never be
 - [Timing Workloads with Spot Instances and Spot Fleets](#timing-workloads-with-spot-instances-and-spot-fleet)
 - [Deploying vCenter in AWS with VMWare Cloud on AWS](#deploying-vcenter-in-aws-with-vmware-cloud-on-aws)
 - [Extending AWS Beyond the Cloud with AWS Outposts](#extending-aws-beyond-the-cloud-with-aws-outposts)
-- [Lab: EC2 Instance Bootstrapping](#lab-ec2-instance-bootstrapping)
-- [Lab: EC2 Roles and Instance Profiles in AWS](#lab-ec2-roles-and-instance-profiles-in-aws)
-- [Quiz: Elastic Cloud Compute EC2](#quiz-elastic-cloud-compute-ec2)
+- [Lab - EC2 Instance Bootstrapping](#lab---ec2-instance-bootstrapping)
+- [Lab - EC2 Roles and Instance Profiles in AWS](#lab---ec2-roles-and-instance-profiles-in-aws)
+- [Quiz - Elastic Cloud Compute EC2](#quiz---elastic-cloud-compute-ec2)
 
 ## Overview
 
@@ -1937,7 +1937,7 @@ Bring the AWS Management Console, APIs, and SDKs into your data center, allowing
   Scenario about extending AWS to your data center? **Think AWS Outposts**
 </Note>
 
-## Lab: EC2 Instance Bootstrapping
+## Lab - EC2 Instance Bootstrapping
 
 ### Manually Install Software on `webserver-01`
 
@@ -2265,7 +2265,7 @@ aws --version
 14. Navigate back to the EC2 dashboard and copy the **Public IP address** for `webserver-03`.
 15. Paste the IP address in a new tab to confirm the Apache web page for `webserver-03`.
 
-## Lab: EC2 Roles and Instance Profiles in AWS
+## Lab - EC2 Roles and Instance Profiles in AWS
 
 ### Create a Trust Policy and Role Using the AWS CLI
 
@@ -2553,7 +2553,7 @@ It should list the files.
 
 This time, our access will be denied — which means our configuration is properly set up.
 
-## Quiz: Elastic Cloud Compute EC2
+## Quiz - Elastic Cloud Compute EC2
 
 <Note>
 Which of the following is not a valid use case for IAM roles?
@@ -2588,8 +2588,8 @@ AWS Outposts
 - [FSx Overview](#fsx-overview)
 - [Amazon Machine Image: EBS vs Instance Store](#amazon-machine-image-ebs-vs-instance-store)
 - [AWS Backups](#aws-backups)
-- [Lab: Reduce Storage Costs with EFS](#lab-reduce-storage-costs-with-efs)
-- [Quiz: EBS abd EFS](#quiz-ebs-and-efs)
+- [Lab - Reduce Storage Costs with EFS](#lab---reduce-storage-costs-with-efs)
+- [Quiz - EBS abd EFS](#quiz---ebs-and-efs)
 
 ## EBS Overview
 
@@ -3127,7 +3127,7 @@ Backup policies can be enforced while backups can be encrypted both at rest and 
 
 </Note>
 
-## Lab: Reduce Storage Costs with EFS
+## Lab - Reduce Storage Costs with EFS
 
 ### Create an EFS File System
 
@@ -3443,7 +3443,7 @@ You should see `file.01` through `file.10`, indicating you are using the shared 
 8. Use the **Actions** dropdown to select **Delete volume**.
 9. Type `delete` into the text box to confirm your choice, and then click **Delete**.
 
-## Quiz: EBS abd EFS
+## Quiz - EBS abd EFS
 
 <Note>
 Which of the following statements about Amazon Machine Images (AMIs) is true?
@@ -3482,8 +3482,8 @@ You can create an unencrypted EBS volume from an encrypted snapshot by unselecti
 - [Implementing Graph Databases Using Amazon Neptune](#implementing-graph-databases-using-amazon-neptune)
 - [Leveraging Amazon Quantum Ledger Database (Amazon QLDB) for Ledger Databases](#leveraging-amazon-quantum-ledger-database-amazon-qldb-ledger-databases)
 - [Analyzing Time-Series Data with Amazon Timestream](#analyzing-time-series-data-with-amazon-timestream)
-- [Lab: Set Up a WordPress Site Using EC2 and RDS](#lab-set-up-a-wordpress-site-using-ec2-and-rds)
-- [Quiz: Databases](#quiz-databases)
+- [Lab - Set Up a WordPress Site Using EC2 and RDS](#lab---set-up-a-wordpress-site-using-ec2-and-rds)
+- [Quiz - Databases](#quiz---databases)
 
 ## Relational Database Service (RDS) Overview
 
@@ -4080,7 +4080,7 @@ A serverless, fully managed database service for time-series data. You can analy
   time-series data for analysis, **think of Timestream**.
 </Note>
 
-## Lab: Set Up a WordPress Site Using EC2 and RDS
+## Lab - Set Up a WordPress Site Using EC2 and RDS
 
 ### Create RDS Database
 
@@ -4216,7 +4216,7 @@ define('DB_HOST', '<INSERT ENDPOINT HERE>');
 8. To view the website you just created, click **A Cloud Guru** in the top left corner of the page.
 9. Click **Visit Site** to visit your newly created WordPress site.
 
-## Quiz: Databases
+## Quiz - Databases
 
 <Note>
 Which of the following is the correct description of Amazon Timestream?
@@ -4255,8 +4255,8 @@ Amazon Keyspaces.
 - [Connecting On-Premises with Direct Connect](#connecting-on-premises-with-direct-connect)
 - [Simplifying Networks with Transit Gateway](#simplifying-networks-with-transit-gateway)
 - [5G Networking with AWS Wavelength](#5g-networking-with-aws-wavelength)
-- [Lab: Build Solutions across VPCs with Peering](#lab-build-solutions-across-vpcs-with-peering)
-- [Quiz: Virtual Private Cloud (VPC) Networking](#quiz-virtual-private-cloud-vpc-networking)
+- [Lab - Build Solutions across VPCs with Peering](#lab---build-solutions-across-vpcs-with-peering)
+- [Quiz - Virtual Private Cloud (VPC) Networking](#quiz---virtual-private-cloud-vpc-networking)
 
 ## VPC Overview
 
@@ -4709,7 +4709,7 @@ Embeds AWS compute and storage services within 5G networks, providing mobile edg
   edge using mobile networks, **think of AWS Wavelength**.
 </Note>
 
-## Lab: Build Solutions across VPCs with Peering
+## Lab - Build Solutions across VPCs with Peering
 
 ### Create `Web_VPC` Subnets and Attach a New Internet Gateway
 
@@ -4910,7 +4910,7 @@ sudo vim wp-config.php
 14. Click **Install WordPress**.
 15. Reload the public IP address in the address bar to view your newly created WordPress blog.
 
-## Quiz: Virtual Private Cloud (VPC) Networking
+## Quiz - Virtual Private Cloud (VPC) Networking
 
 <Note>
 How would you scale an individual NAT gateway to support more bandwidth?
@@ -4946,7 +4946,7 @@ By default, what range of IP addresses and ports do security groups leave open f
 - [Demo: Using a Geoproximity Routing Policy](#demo-using-a-geoproximity-routing-policy)
 - [Demo: Using a Latency Routing Policy](#demo-using-a-latency-routing-policy)
 - [Demo: Using a Multivalue Routing Policy](#demo-using-a-multivalue-routing-policy)
-- [Quiz: Route 53](#quiz-route-53)
+- [Quiz - Route 53](#quiz---route-53)
 
 ## Route 53 Overview
 
@@ -5247,7 +5247,7 @@ You can specify multiple values for almost any record, but multivale answer rout
 
 ![Multivalue Answer Routing](../images/multivalue-answer-routing.png)
 
-## Quiz: Route 53
+## Quiz - Route 53
 
 <Note>
 Which of the following statements about Amazon Route 53 is true?
@@ -5280,8 +5280,8 @@ Which of the following statements about Route 53 is true?
 - [Using the Classic Load Balancer](#using-the-classic-load-balancer)
 - [Getting "Stuck" with Sticky Sessions](#getting-stuck-with-sticky-sessions)
 - [Leaving the Load Balancer with Deregistration Delay](#leaving-the-load-balancer-with-deregistration-delay)
-- [Lab: Use Application Load Balancers for Web Servers](#lab-use-application-load-balancers-for-web-servers)
-- [Quiz: Elastic Load Balancing (ELB)](#quiz-elastic-load-balancing-elb)
+- [Lab - Use Application Load Balancers for Web Servers](#lab---use-application-load-balancers-for-web-servers)
+- [Quiz - Elastic Load Balancing (ELB)](#quiz---elastic-load-balancing-elb)
 
 ## ELB Overview
 
@@ -5549,7 +5549,7 @@ This enables the load balancer to complete in-flight requests made to instances 
 
 </Note>
 
-## Lab: Use Application Load Balancers for Web Servers
+## Lab - Use Application Load Balancers for Web Servers
 
 ### Observe the Provided EC2 Website and Create a Second Server
 
@@ -5658,7 +5658,7 @@ sudo systemctl start apache2
 8. Click **Save changes**.
 9. Refresh the tab where you navigated to the load balancer's public IP. This time, no matter how many times you refresh, it will stay on the same instance (noted by the local IP).
 
-## Quiz: Elastic Load Balancing (ELB
+## Quiz - Elastic Load Balancing (ELB
 
 <Note>
 Which of the following statements about Application Load Balancers (ALBs) is true?
@@ -5692,5 +5692,60 @@ What happens if all registered targets in a Network Load Balancer (NLB) are unhe
 When the NLB has only unhealthy registered targets, the Network Load Balancer routes requests to all the registered targets, known as fail-open mode.
 
 _Reference Documentation: Health Checks for Your Target Groups [https://docs.aws.amazon.com/elasticloadbalancing/latest/network/target-group-health-checks.html]()_
+
+</Note>
+
+# Chapter 11 - Monitoring
+
+- [CloudWatch Overview](#cloudwatch-overview)
+- [Application Monitoring with CloudWatch Logs](#application-monitoring-with-cloudwatch-logs)
+- [Monitoring with Amazon Managed Service for Prometheus and Amazon Managed Grafana](#monitoring-with-amazon-managed-service-for-prometheus-and-amazon-managed-grafana)
+- [Lab - Implement Advanced CloudWatch Monitoring for a Web Server](#lab---implement-advanced-cloudwatch-monitoring-for-a-web-server)
+- [Lab - Work with AWS VPC Flow Logs for Network Monitoring](#lab---work-with-aws-vpc-flow-logs-for-network-monitoring)
+- [Quiz - Monitoring](#quiz---monitoring)
+
+## CloudWatch Overview
+
+### What is CloudWatch
+
+CloudWatch is a **monitoring** and **observability** platform that was designed to give us insight into our AWS architecture. It allows us to monitor multiple levels of our applications to **identify** potential issues.
+
+### CloudWatch Features
+
+| System Metrics                                                                                    | Application Metrics                                                                         | Alarms                                                                                                                 |
+| :------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------- |
+| These are metrics that you get out of the box. The more managed the service is, the more you get. | By installing the CloudWatch agent, you can get information from inside your EC2 instances. | What's the point of collecting data if you don't do something with it? Alarms can alert you when something goes wrong. |
+
+### Types of Metrics
+
+**Metrics**
+
+- **Default** - these metrics are provided out of the box and do not require any additional work on your part to configure.
+- **Custom** - these metrics will need to be provided by using CloudWatch agent installed on the host.
+
+| Metric                 | Default | Custom |
+| :--------------------- | :------ | :----- |
+| CPU Utilization        | ✅      |        |
+| Network Throughput     | ✅      |        |
+| EC2 Memory Utilization |         | ✅     |
+| EBS Storage Capacity   |         | ✅     |
+
+### Exam Tips
+
+<Note>
+**Go to Tool**  
+Anytime monitoring comes up, think **CloudWatch**.
+
+**Alarms**  
+There are **no default alarms**. Anything you want to hear about must be created.
+
+**Default vs Custom**  
+AWS can't see past the hypervisor level for EC2 instances.
+
+**Managed Services**  
+The more managed a service is, the more checks you get out of the box.
+
+**Basic vs Detailed**  
+Basic is 5-minute intervals, whereas detailed is 1-minute.
 
 </Note>
