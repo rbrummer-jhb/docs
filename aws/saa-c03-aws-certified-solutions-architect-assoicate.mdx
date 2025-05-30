@@ -15,7 +15,7 @@ icon: ""
 - [Chapter 7 - Databases](#chapter-7---databases)
 - [Chapter 8 - Virtual Private Cloud (VPC) Networking](#chapter-8---virtual-private-cloud-vpc-networking)
 - [Chapter 9 - Route 53](#chapter-9---route-53)
-- [Chapter 10 - Elastic Load Balancing ELB](#chapter-10---elastic-load-balancing-elb)
+- [Chapter 10 - Elastic Load Balancing (ELB)](#chapter-10---elastic-load-balancing-elb)
 - [Chapter 11 - Monitoring](#chapter-11---monitoring)
 - [Chapter 12 - High Availability and Scaling](#chapter-12---high-availability-and-scaling)
 - [Chapter 13 - Decoupling Workflows](#chapter-13---decouling-workflows)
@@ -4909,3 +4909,788 @@ sudo vim wp-config.php
 
 14. Click **Install WordPress**.
 15. Reload the public IP address in the address bar to view your newly created WordPress blog.
+
+## Quiz: Virtual Private Cloud (VPC) Networking
+
+<Note>
+How would you scale an individual NAT gateway to support more bandwidth?
+
+**You don't. AWS handles this for you.**
+
+Network Access Control Lists (NACLs) are associated with what AWS VPC component?
+
+**Subnet.**
+
+What is an optional layer of security for your VPC that acts as a firewall for controlling traffic in and out of one or more subnets?
+
+**Network ACLs.**
+
+When would you want to use Direct Connect?
+
+**When you need a high-speed private connection from your op-premises environment to AWS.**
+
+By default, what range of IP addresses and ports do security groups leave open for inbound traffic?
+
+**None. They are closed by default.**
+
+</Note>
+
+# Chapter 9 - Route 53
+
+- [Route 53 Overview](#route-53-overview)
+- [Register a Domain Name](#register-a-domain-name)
+- [Demo: Using a Simple Routing Policy](#demo-using-a-simple-routing-policy)
+- [Demo: Using a Weighted Routing Policy](#demo-using-a-weighted-routing-policy)
+- [Demo: Using a Failover Routing Policy](#demo-using-a-failover-routing-policy)
+- [Demo: Using a Geolocation Routing Policy](#deom-using-a-geolocation-routing-policy)
+- [Demo: Using a Geoproximity Routing Policy](#demo-using-a-geoproximity-routing-policy)
+- [Demo: Using a Latency Routing Policy](#demo-using-a-latency-routing-policy)
+- [Demo: Using a Multivalue Routing Policy](#demo-using-a-multivalue-routing-policy)
+- [Quiz: Route 53](#quiz-route-53)
+
+## Route 53 Overview
+
+### What is DNS
+
+**If you've used the internet, you've used DNS.**  
+DNS is used to convert human-friendly domain names (e.g. `http://acloud.guru`) into an Internet Protocol (IP) address (e.g. `http://82.125.53.1`).
+
+IP addresses are used by computers to identify each other on the network. IP addresses commonly come in 2 different forms: IPv4 and IPv6.
+
+### IPv4 vs IPv6
+
+<Note>**IPv4 Addresses Are Running Out**</Note>
+
+**IPv4**  
+The IPv4 space is a **32-bit** field and has over 4 billion different addresses (`4 294 967 296` - to be precise).
+
+**IPv6**  
+IPv6 was created to solve this depletion issue and has an address space of **128 bits**.
+
+**IPv6 Addresses**  
+In theory, there are `340 282 366 920 938 463 463 374 607 431 768 211 456` (or 340 undecillion) addresses.
+
+### Top-Level Domains
+
+<Tip>
+  The last word in a domain name represents the top-level domain. The second
+  word in a domain name is known as a second-level domain name (this is
+  optional, though, and depends on the domain name).
+</Tip>
+
+![Top-Level Domains](../images/top-level-domains.png)
+
+These top-level domain names are controlled by the **Internet Assigned Numbers Authority (IANA)** in a root zone database, which is essentially a database of all available top-level domains.
+
+You can view this database by visiting: [http://www.iana.org/domains/root/db]()
+
+### Domain Registrars
+
+Because all names in a given domain name must be unique, there needs to be a way to organize this all so that domain names aren't duplicated. This is where domain registrars come in.
+
+<Tip>
+  A registrar is an authority that can assign domain names directly under or or
+  more top-level domains. These domains are registered with InterNIC, a service
+  of ICANN, which enforces uniqueness of domain names acorss the internet.
+</Tip>
+
+Popular Domain Registrars:
+
+- domain.com
+- GoDaddy
+- Hover
+- AWS
+- Namecheap
+
+### Common DNS Record Types
+
+**SOA (Start of Authority)**  
+Stores information about:
+
+- The name of the server that supplied the data for the zone.
+- The administrator of the zone.
+- The current version of the data file.
+- The default number of seconds for the time-to-live file on resource records.
+
+**NS (Name Server)**  
+Used by top-level domain servers to direct traffic to the content DNS server that contains the authoritative DNS records.
+
+**A (Address)**
+
+- The fundamental type of DNS record.
+- Used by a computer to translate the name of the domain to an IP address.
+
+For example, `http://www.acloud.guru` => `http://123.10.10.80`.
+
+**CNAME (Canonical Name)**  
+Can be used to resolve one domain name to another. For example, you may have a mobile website with the domain name `http://m.acloud.guru` that is used for when users browse to your domain name on their mobile devices.
+
+For example, `http://m.acloud.guru` => `http://mobile.acloud.guru`.
+
+### What is a TTL
+
+The length that a DNS record is cached on either the resolving server or the user's own local PC is equal to the value of the **time to live (TTL)** in seconds.
+
+The lower the time to live, the faster changes to DNS records take to propagate throughout the internet.
+
+### Alias Records
+
+Are used to map resource record sets in your hosted zone to load balancers, CloudFront distributions, or S3 buckets that are configured as websites.
+
+Alias records work like a `CNAME` record in that you can map one DNS name (`www.example.com`) to another "target" DNS name (`elb1234.elb.amazonaws.com`).
+
+| CNAME                                                         | A Record/Alias                                            |
+| :------------------------------------------------------------ | :-------------------------------------------------------- |
+| **Cannot** be used for naked domain names (zone apex record). | **Can** be used for a naked domain name/zone apex record. |
+| You can't have a CNAME for `http://acloud.guru.com`.          |                                                           |
+
+### What is Route 53
+
+**Amazon's DNS Service**  
+Allows you to register domain names, create hosted zones, and manage and create DNS records.
+
+<Note>
+  Route 53 is named after Route 66 (one of the original highways across the
+  United States) but is called 53 because DNS operates on port 53.
+</Note>
+
+### Routing Policies
+
+**7 Routing Policies Available with Route 53**
+
+- Simple Routing
+- Weighted Routing
+- Latency-Based Routing
+- Failover Routing
+- Geolocation Routing
+- Geoproximity Routing (Traffic Flow Only)
+- Multivalue Answer Routing
+
+### Exam Tips
+
+<Note>
+Understand the difference between an alias record and a CNAME.
+
+Given the choice, always choose an alias record over a CNAME.
+
+SOA records.
+
+CNAME records.
+
+NS Recrods.
+
+A Records.
+
+</Note>
+
+## Register a Domain Name
+
+- You can buy domain names directly with AWS.
+- It can take up to 3 days to register depending on the circumstances.
+
+## Demo: Using a Simple Routing Policy
+
+### Simple Routing Policy
+
+If you choose the simple routing policy, you can only have **one record with multiple IP addresses**. If you specify **multiple values in a record**, Route 53 returns **all values** to the user in a **random order**.
+
+![Simple Routing](../images/simple-routing.png)
+
+### Exam Tips
+
+<Note>
+  If you choose the simple routing policy, you can only have **one record with
+  multiple IP addresses**. If you specify **multiple values in a record**, Route
+  53 returns **all values** to the user in a **random order**.
+</Note>
+
+## Demo: Using a Weighted Routing Policy
+
+### Weighted Routing Policy
+
+Allows you to split your traffic based on different weights assigned.
+
+<Note>
+  For example, you can set 10% of your traffic to go to `us-east-1` and 90% to
+  go to `eu-west-1`.
+</Note>
+
+### Health Checks
+
+- You can set health checks on **individual** record sets.
+- If a record set **fails** a health check, it will be removed from Route 53 until it **passes** the health check.
+- You can set SNS notifications to **alert** you about failed health checks.
+
+```
+Specify endpoint by: IP address or Domain name
+Protocol: HTTP
+IP address: 52.192.111.92
+Host name: index.html
+Port: 80
+Path: /
+```
+
+### Exam Tips
+
+<Note>
+  In this example, Route 53 sent 30% of the traffic to **London** and 70% of the
+  traffic to **Tokyo**.
+</Note>
+
+## Demo: Using a Failover Routing Policy
+
+### Failover Routing Policy
+
+- Are used when you want to create an active/passive setup.
+- For example, you may want your primary site to be in `eu-west-1` and your secondary DR Site in `ap-southeast-2`.
+- Route 53 will monitor the health of your primary site using a health check.
+
+![Failover Routing](../images/failover-routing.png)
+
+### Exam Tips
+
+<Note>
+  In this example Route 53 will send traffic to `ap-southeast-2` because it has
+  detected a failure in `eu-west-2`.
+</Note>
+
+## Demo: Using a Geolocation Routing Policy
+
+### Geolocation Routing Policy
+
+Lets you choose **where your traffic will be sent** based on the geographic location of your users (i.e. the location from which DNS queries orignate).
+
+### Use Cases
+
+For example, you might want all queries from Europe to be routed to a fleet of EC2 instances that are specifically configured for your European customers.
+
+![Geolocation Routing](../images/geolocation-routing.png)
+
+### Exam Tips
+
+<Note>
+  In this example, Route 53 will send the European customers to **London** and
+  the US customers to **Tokyo**.
+</Note>
+
+## Demo: Using a Geoproximity Routing Policy
+
+### Geoproximity Routing Policy
+
+**Route 53 Traffic Flow**  
+You can use Route 53 traffic flow to build a routing system that uses a combination of:
+
+- Geographic location
+- Latency
+- Availability to route traffic
+
+...from your users to your cloud or on-premises endpoints.
+
+<Tip>
+  You can build your traffic routing policies from scratch, or you can pick a
+  template from a library and then customize it.
+</Tip>
+
+**Geoproximity Routing (Traffic Flow Only)**
+
+- Lets Amazon Route 53 route traffic to your resources based on the geographic location of your users and your resources.
+- You can also optionally choose to route more traffic or less to a given resource by specifying a value, known as a **bias**.
+
+<Note>
+  A bias expands or shrinks the size of the geographic region from which traffic
+  is routed to a resource.
+</Note>
+
+### Exam Tips
+
+<Note>
+**Geoproximity routing** lets Amazon Route 53 route traffic to your resources based on the geographic location of your users and your resources.
+
+**You can also optionally choose to route more traffic or less to a given resource by specifying a value, known as a bias.** A bias expands or shrinks the size of the geographic region from which traffic is routed to a resource.
+
+To use **geoproximity routing**, you must use Route 53 **traffic flow**.
+
+</Note>
+
+## Demo: Using a Latency Routing Policy
+
+### Latency Routing Policy
+
+Allows you to route your traffic based on **the lowest network latency for your end user** (i.e. which region will give them the fastest response time).
+
+**Latency Resource Record Set**
+
+To use latency-based routing, you create a latency resource record set for the EC2 (or ELB) resource in each region that hosts your website.
+
+When Route 53 receives a query for your site, it selects the latency resource record set for the region that gives the user the lowest latency.
+
+Route 53 then responds with the value associated with that resource record set.
+
+![Latency Routing](../images/latency-routing.png)
+
+### Exam Tips
+
+<Note>
+  In this example, Route 53 send the traffic to `eu-west-2` because it has a
+  much lower latency than `ap-southeast-2`.
+</Note>
+
+## Demo: Using a Multivalue Routing Policy
+
+### Multivalue Answer Routing
+
+Lets you **configure Amazone Route 53 to return multiple values**, such as IP addresses for your web servers, in response to DNS queries.
+
+**Similar To Simple Routing**
+
+You can specify multiple values for almost any record, but multivale answer routing also lets you check the health of each resource, so Route 53 returns only values for healthy resources.
+
+![Multivalue Answer Routing](../images/multivalue-answer-routing.png)
+
+## Quiz: Route 53
+
+<Note>
+Which of the following statements about Amazon Route 53 is true?
+
+**You can associate multiple IP addresses with a single record.**
+
+Using Route 53, how would you direct `example.com` traffic to 1 primary IP with a second one for backup?
+
+**Use a failover routing policy.**
+
+Which of the following statements about Route 53 and domain names is true?
+
+**Route 53 allows you to register a domain programmatically.**
+
+Route 53 is a managed [_] service?
+
+**DNS**
+
+Which of the following statements about Route 53 is true?
+
+**Route 53 supports both IPv4 and IPv6.**
+
+</Note>
+
+# Chapter 10 - Elastic Load Balancing (ELB)
+
+- [ELB Overview](#elb-overview)
+- [Using Application Load Balancers](#using-application-load-balancers)
+- [Extreme Performance with Network Load Balancers](#extreme-performance-with-network-load-balancers)
+- [Using the Classic Load Balancer](#using-the-classic-load-balancer)
+- [Getting "Stuck" with Sticky Sessions](#getting-stuck-with-sticky-sessions)
+- [Leaving the Load Balancer with Deregistration Delay](#leaving-the-load-balancer-with-deregistration-delay)
+- [Lab: Use Application Load Balancers for Web Servers](#lab-use-application-load-balancers-for-web-servers)
+- [Quiz: Elastic Load Balancing (ELB)](#quiz-elastic-load-balancing-elb)
+
+## ELB Overview
+
+### What is Elastic Load Balancing
+
+Automatically distributes incoming application traffic across multiple targets, such as Amazon EC2 instances. This can be done across multiple AZs.
+
+### Types of Load Balancers
+
+**Application** Load Balancer  
+Best suited for load balancing of HTTP/S traffic. They operate at Layer 7 and are application aware.
+
+Intelligent Load Balancer.
+
+**Network** Load Balancer  
+Operating at the connection level (Layer 4) on the OSI Model, Network Load Balancers are capable of handling millions of requests per second, while maintaining ultra-love latencies.
+
+Performance Load Balancer
+
+**Gateway** Load Balancer  
+Operating at the Network Level on the OSI Model (Layer 3), you should use Gateway Load Balancer when deploying inline virtual appliances where network traffic is not destined for the Gateway Load Balancer itself.
+
+For Inline Virtual Appliance Load Balancing
+
+**Classic** Load Balancer  
+Legacy load balancers. You can load balance HTTP/S applications and use Layer 7-specific features, such as X-Forwarded and sticky sessions.
+
+Classic/Test/Dev Load Balancer
+
+### Health Checks
+
+All AWS load balancers can be configured with health checks. Health checks periodically send requests to load balancers' registered instances to test their status.
+
+<Tip>
+  The status of the instances that are healthy at the time of the health check
+  is `InService`.
+</Tip>
+
+The load balancer performs health checks on all registered instances, whether the instance is in a healthy state or an unhealthy state.
+
+<Tip>
+  The status of any instances that are unhealthy at the time of the health check
+  is `OutOfService`.
+</Tip>
+
+The **load balancer** routes requests only to the healthy instances. When the load balancer determines an instance is unhealthy, it stops routing requests to that instance.
+
+<Note>
+  The load balancer resumes routing requests to the instance when it has been
+  restored to a healthy state.
+</Note>
+
+### Exam Tips
+
+<Note>
+Application Load Balancers
+
+Network Load Balancers
+
+Gateway Load Balancers
+
+Classic Load Balancers
+
+You can use **health checks** to route your traffic to instances or targets that are healthy.
+
+</Note>
+
+## Using Application Load Balancers
+
+### Layer 7 Load Balancing
+
+An Application Load Balancer functions at the Application Layer - the seventh layer of the Open Systems Interconnection (OSI) model. After the load balancer receives a request, it evaluates the listener rules in priority order to determine which rule to apply, and then selects a target from the target group for the rule action.
+
+### Listeners, Rules, and Target Groups
+
+**Listeners**
+
+- A listener checks for connection requests from clients, using the protocol and port you configure.
+- You define rules that determine how the load balancer routes requests to its registered targets.
+- Each rule consists of a priority, one or more actions, and one or more conditions.
+
+**Rules**
+
+When the conditions for a rule are met, then its actions are performed. You must define a default rule for each listener, and you can **optionally define additional rules**.
+
+**Target Groups**
+
+Each **target group** routes requests to one or more registered targets, such as EC2 instances, using the protocol and port number you specify.
+
+### Path-Based Routing
+
+Intelligent routing that forwards requests to different EC2 instances based on the path of the hostname.
+
+### Application Load Balancer Diagram
+
+![application-load-balancer](../images/application-load-balancer.png)
+
+### Limitations of Application Load Balancers
+
+<Tip>Application Load Balancers only support `HTTP/S`.</Tip>
+
+**HTTP Load Balancing**  
+To use an HTTPS listener, you must deploy at least one SSL/TLS server certificate on your load balancer. The load balancer uses a server certificate to terminate the frontend connection and then decrypt requests from clients before sending them to the targets.
+
+### Exam Tips
+
+<Note>
+**Listeners:** A listener checks for connection requests from clients, using the protocol and port you configure.
+
+**Rules:** Determine how the load balancer routes requests to its registered targets. Each rule consists of a priority, one or more actions, and one or more conditions.
+
+**Target Groups:** Each target group routes requests to one or more registered targets, such as EC2 instances, using the protocol and port number you specify.
+
+**Limitations:** Application Load Balancers only support `HTTP/S`.
+
+**HTTPS:** To use an HTTPS listener, you must deploy at least one SSL/TLS server certificate on your load balancer. The load balancer uses a server certificate to terminate the frontend connection and then decrypt requests from clients before sending them to the targets.
+
+</Note>
+
+## Extreme Performance with Network Load Balancers
+
+### Layer 4 Load Balancing
+
+A Network Load Balancer functions at the fourth layer of the Open Systems Interconnection (OSI) model. It can handle millions of requests per second.
+
+### Requests Received, Listeners, and Target Groups
+
+**Request Received**
+
+After the load balancer receives a connection request, it selects a target from the target group for the default rule.
+
+It attempts to open a TCP connection to the selected target on the port specified in the listener configuration.
+
+**Listeners**
+
+Checks for connection requests from clients, using the protocol and port you configure.
+
+The listener on a Network Load Balancer then forwards the request to the target group. There are no rules, unlike with Application Load Balancers.
+
+**Target Groups**
+
+Each **target group** routes requests to one or more registered targets, such as EC2 instances, using the protocol and port number you specify.
+
+### Ports and Protocols
+
+| Protocols              | Ports   |
+| :--------------------- | :------ |
+| TCP, TLS, UDP, TCP_UDP | 1-65535 |
+
+### Use Cases
+
+<Tip>
+  Network Load Balancers are **best suited for load balancing of TCP traffic**
+  where extreme performance is required. Operating at the connection level
+  (Layer 4), Network Load Balancers are capable of handling millions of requests
+  per second, while maintaining ultra-low latencies.
+
+**Use for extreme performance!**
+
+</Tip>
+
+### Encryption
+
+You can use a TLS listener to offload the work of encryption and decryption to your load balancer so your applications can focus on their business logic.
+
+If the listener protocol is TLS, you must deploy exactly one SSL server certificate on teh listener.
+
+### Exam Tips
+
+<Note>
+Network Load Balancers operate at Layer 4.
+
+Use where you need extreme performance.
+
+Other use cases are where you need protocols not supported by Application Load Balancers.
+
+Network Load Balancers can decrypt traffic, but you will need to install the certificate on the load balancer.
+
+</Note>
+
+## Using the Classic Load Balancer
+
+### Classic Load Balancers
+
+Are the legacy load balancers. You can load balance HTTP/S applications and use Layer 7-specific features, such as X-Forwarded and sticky sessions. You can also use strict Layer 4 load balancing for applications that rely purely on the TCP protocol.
+
+### X-Forwarded-For
+
+When traffic is sent from a load balancer, the server access logs contain the IP address of the proxy or load balancer only.
+
+<Tip>
+  To see the original IP address of the client, the `x-forwarded-for` request
+  header is used.
+</Tip>
+
+### Gateway Timeouts
+
+If your application stops responding, the Classic Load Balancer responds with a 504 error.
+
+This means the application is having issues. This could be either at the web server layer or database layer.
+
+### Exam Tips
+
+<Note>
+**A 504 error means the gateway has timed out.**
+This means the application is not responding within the idle timeout period.
+
+**Troubleshoot the application.**
+Is it the web server or the database server.
+
+**Need the IPv4 address of your end user?**
+Look for the `x-forwarded-for` header.
+
+</Note>
+
+## Getting "Stuck" with Sticky Sessions
+
+### What are Sticky Sessions
+
+**Classic Load Balancers** route each request independently to the registered EC2 instance with the smallest load.
+
+Sticky sessions allow you to bind a user's session to a specific EC2 instance. This ensures all requests from the user during the session are sent to the same instance.
+
+<Tip>
+  You can **enable sticky sessions** for Application Load Balancers as well, but
+  the traffic will be sent at the target group level.
+</Tip>
+
+### Network Diagram
+
+![Sticky Sessions](../images/sticky-sessions.png)
+
+### Exam Tips
+
+<Note>
+  **Sticky sessions** enable your users to stick to the **same EC2 instance**.
+  Can be useful if you are **storing information locally** to that instance.
+
+You may see a **scenario-based question** where you remove an EC2 instance from a pool, but the load balancer **continues to direct traffic** to that EC2 instance.
+
+To solve a scenraio like this, **disable** sticky sessions.
+
+</Note>
+
+## Leaving the Load Balancer with Deregistration Delay
+
+### What is Deregistration Delay
+
+Allows Load Balancers to keep existing connections open if the EC2 instances are de-registered or become unhealthy.
+
+This enables the load balancer to complete in-flight requests made to instances that are de-registering or unhealthy.
+
+<Tip>
+  You can disable deregistration delay if you want your load balancer to
+  immediately close connections to the instances that are de-registering or have
+  become unhealthy.
+</Tip>
+
+### Exam Tips
+
+<Note>
+**Enable deregistration delay:** Keep existing connections open if the EC2 instance becomes unhealthy.
+
+**Disable deregistration delay:** Do this if you want your load balancer to immediately close connections to the instances that are de-registering or have become unhealthy.
+
+</Note>
+
+## Lab: Use Application Load Balancers for Web Servers
+
+### Observe the Provided EC2 Website and Create a Second Server
+
+1. Navigate to **EC2**.
+2. Click **Instances (running)**.
+3. Select the box next to `webserver-01`.
+4. Copy its **Public IPv4 address**.
+
+<Note>
+  **Note:** Do NOT try clicking on the open address link as it won't work.
+</Note>
+
+5. In a new browser tab, paste in the public IP address you just copied. You should see the load balancer demo page.
+6. Back in the EC2 console, at the top, click **Launch instances**.
+7. Under **Name and Tags**, enter "`webserver2`".
+8. Under **Application and OS Images (Amazon Machine Image)**, select **Ubuntu** and `Ubuntu Server 22.04 LTS`.
+
+<Note>
+  **Note:** If you get a popup window that tells you some of your current
+  settings will be changed, click on Confirm changes.
+</Note>
+
+9. Under **Instance Type**, select `t3.micro`.
+10. Under **Key pair (login)**, in the dropdown, select **Proceed without a key pair**.
+11. Under **Network settings**, click **Edit** and set **Auto-assign Public IP** to **Enable**.
+12. Under **Network settings** > **Firewall (security groups)**, click **Select existing security group** and select the one with `EC2SecurityGroup` in its name (not the default security group).
+13. Under **Advanced Details**, in the **User Data** box, enter the following bootstrap script:
+
+```sh
+#!/bin/bash
+
+# Update and install necessary packages
+sudo apt-get update -y
+sudo apt-get install -y apache2 unzip
+
+# Fetching the token for IMDSv2
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+
+# Starting HTML file
+echo '<html><center><body bgcolor="black" text="#39ff14" style="font-family: Arial"><h1>Load Balancer Demo</h1><h3>Availability Zone: ' > /var/www/html/index.html
+
+# Using the token to fetch metadata
+echo $(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone) >> /var/www/html/index.html
+echo '</h3> <h3>Instance Id: ' >> /var/www/html/index.html
+echo $(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id) >> /var/www/html/index.html
+echo '</h3> <h3>Public IP: ' >> /var/www/html/index.html
+echo $(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4) >> /var/www/html/index.html
+echo '</h3> <h3>Local IP: ' >> /var/www/html/index.html
+echo $(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4) >> /var/www/html/index.html
+
+# Ending HTML file
+echo '</h3></html> ' >> /var/www/html/index.html
+
+# - Ensure the Apache2 service is enabled and started.
+sudo systemctl enable apache2
+sudo systemctl start apache2
+```
+
+14. Click **Launch Instance**.
+15. Click the **Instance ID** (this will start with `i-`).
+16. Once it's in the Running state, copy the **Public IPv4 address**.
+
+<Note>
+  **Note:** Do NOT try clicking on the open address link as it won't work.
+</Note>
+
+17. In a new browser tab, paste in the public IP address you just copied. You should see the load balancer demo page again, which means the legacy clone is successfully running. This time, though, it will have a different instance ID, public IP, and local IP listed.
+
+<Note>
+  **Note:** If your second EC2 doesn't open the demo page, it may need a couple
+  of minutes to finish provisioning. Wait for the **Status check** column to
+  show "**2/2 checks passed**".
+</Note>
+
+### Create an Application Load Balancer
+
+1. Back in the EC2 console, click **Load Balancers** in the left-hand menu.
+2. Click **Create Load Balancer**.
+3. From the **Application Load Balancer** card, click **Create**.
+4. For **Load balancer name**, enter `LegacyALB`.
+5. Under **Network mapping**, click the **VPC** dropdown, and select the listed VPC.
+6. When the **Availability Zones** list pops up, select each one (`us-east-1a`, `us-east-1b`, and `us-east-1c`).
+7. Under **Security groups**, deselect the default security group listed, and select the one from the dropdown with `EC2SecurityGroup` in its name.
+8. Under **Listeners and routing**, ensure that the **Protocol** is set to **HTTP** and the **Port** is `80`. Then, under **Default action**, click **Create target group** This will open a new tab. Keep this first tab open to complete later.
+9. For **Target group name**, enter `TargetGroup`.
+10. Click **Next**.
+11. Under **Available instances**, select both targets that are listed.
+12. Click **Include as pending below**.
+13. Click **Create target group**.
+14. Back in the first tab, under **Default action**, click the refresh button (looks like a circular arrow), and in the dropdown, select the `TargetGroup` you just created.
+15. Click **Create load balancer**.
+16. On the next screen, click **View load balancer**.
+17. Wait a few minutes for the load balancer to finish provisioning and enter an active state.
+18. Copy its **DNS name**, and paste it into a new browser tab. You should see the load balancer demo page again. The local IP lets you know which instance you were sent (or "load balanced") to.
+19. Refresh the page a few times. You should see the other instance's local IP listed, meaning it's successfully load balancing between the two EC2 instances.
+
+### Enable Sticky Sessions
+
+1. Back on the **EC2** > **Load Balancers** page, select the **Listeners** tab.
+2. Click the **TargetGroup** link in the **Default action** column, which opens the target group.
+3. Select the **Attributes** tab.
+4. Click **Edit**.
+5. Check the box next to **Stickiness** to enable it.
+6. Leave **Stickiness type** set to **Load balancer generated cookie**.
+7. Leave **Stickiness duration** set to **1 days**.
+8. Click **Save changes**.
+9. Refresh the tab where you navigated to the load balancer's public IP. This time, no matter how many times you refresh, it will stay on the same instance (noted by the local IP).
+
+## Quiz: Elastic Load Balancing (ELB
+
+<Note>
+Which of the following statements about Application Load Balancers (ALBs) is true?
+
+**Application Load Balancers can be configured to use static IPs by partnering with a Network Load Balancer.**
+
+_In AWS, an Application Load Balancer (ALB) typically uses dynamic IP addressing. If you need your ALB to have a static IP address, you can achieve this by using a Network Load Balancer (NLB). You can associate the NLB with an Elastic IP address, which is a static, public IPv4 address, and then register your ALB as a target of the NLB. This setup effectively allows the ALB to use a static IP address, although it requires additional configuration and is not the default behavior of an ALB._
+
+Which of the following is NOT an AWS ELB load balancer?
+
+**Geolocation Load Balancer (GLB)**
+
+_This is not an AWS ELB load balancer. Geolocation routing policy is an Amazon Route 53 routing policy that should be used when you want to route traffic based on the location of your users. Reference Documentation: Elastic Load Balancing [https://aws.amazon.com/elasticloadbalancing/]()_
+
+What kind of ELB load balancer would you select if you need to route traffic based on the contents of the request?
+
+**Application Load Balancer (ALB)**
+
+_ALBs allow you to route traffic based on the contents of the requests. Reference: Application Load Balancer [https://aws.amazon.com/elasticloadbalancing/application-load-balancer/]()_
+
+If you're building an application that needs to support an extreme level of networking traffic, which type of ELB load balancer would you pick?
+
+**Network Load Balancer (NLB)**
+
+_NLBs excel when you need extreme levels of performance. Reference Documentation: Network Load Balancer [https://aws.amazon.com/elasticloadbalancing/network-load-balancer/]()_
+
+What happens if all registered targets in a Network Load Balancer (NLB) are unhealthy?
+
+**It will try to send traffic to all the instances.**
+
+When the NLB has only unhealthy registered targets, the Network Load Balancer routes requests to all the registered targets, known as fail-open mode.
+
+_Reference Documentation: Health Checks for Your Target Groups [https://docs.aws.amazon.com/elasticloadbalancing/latest/network/target-group-health-checks.html]()_
+
+</Note>
