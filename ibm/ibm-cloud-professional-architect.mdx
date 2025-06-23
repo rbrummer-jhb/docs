@@ -1,0 +1,271 @@
+---
+title: "IBM Cloud Professional Architect"
+description: "IBM Training 05/2025"
+icon: ""
+---
+
+<Icon icon="ibm" size={64}>
+
+- [Chapter 1 - Introduction to the Cloud Architect Role](#chapter-1---introduction-to-the-cloud-architect-role)
+- [Chapter 2 - Compute Options](#chapter-2---compute-options)
+- [Chapter 3 - Designing Cloud Solutions](#chapter-3---designing-cloud-solutions)
+- [Chapter 4 - Concepts Badge](#chapter-4---concepts-badge)
+- [Chapter 5 - Cloud Options Badge](#chapter-5---cloud-options-badge)
+- [Chapter 6 - Cloud Options Badge](#chapter-6---cloud-options-badge)
+- [Chapter 7 - Networking and Security](#chapter-7---networking-and-security)
+- [Chapter 8 - Cloud Storage](#chapter-8---cloud-storage)
+- [Chapter 9 - Data Analytics and Data Management](#chapter-9---data-analytics-and-data-management)
+- [Chapter 10 - Observability and Resiliency](#chapter-10---observability-and-resiliency)
+- [Chapter 11 - Learning Assessment](#chapter-11---learning-assessment)
+
+# Chapter 1 - Introduction to the Cloud Architect Role
+
+- [Overview of the Cloud Architect Role Curriculum](#overview-of-the-cloud-architect-role-curriculum)
+- [Gathering Functional and Non-Functional Requirements](#gathering-functional-and-non-functional-requirements)
+- [Documenting Requirements for a Cloud Solution](#documenting-requirements-for-a-cloud-solution)
+- [Summary](#summary)
+
+## Overview of the Cloud Architect Role Curriculum
+
+### What is an IBM Cloud Architect
+
+An IBM Cloud Architect designs, plans, and creates cloud solutions on IBM Cloud. Solutions are documented as architectures and can include systems, applications, capabilities, processes, and service components. Architects primarily focus on ensuring the non-functional requirements such as security, availability, and scalability are addressed in the solution architecture.
+
+### Curriculum Topics
+
+**Compute Options**  
+Explores virtual private cloud (VPC) on IBM Cloud, IBM Cloud virtual servers, IBM Cloud container platforms, IBM power system virtual servers, and IBM Cloud for VMWare solutions.
+
+**Designing Cloud Solutions**  
+Explores cloud and hybrid cloud solutions, resilient solutions on different platforms and infrastructures, automation for the application platform using IBM CLoud schematics, integrating Watson AI services, and cloud application integration architecture in IBM Cloud solutions.
+
+**Data Analytics and Data Management**  
+Explores capabilities of analytic services and capabilities of database services on IBM Cloud.
+
+**Cloud Storage**  
+Explores file and block storage solutions on both classic and VPC IBM Cloud offerings.
+
+**Networking and Security**  
+Explores networking and connectivity options with hybrid cloud, cloud native, and VPC. Also explores architecture considerations for IBM Cloud security, IBM Cloud encryption, and Key Management Services.
+
+**Observability and Resiliency**  
+Explores monitoring and alerting capabilities of IBM Cloud Monitoring, logging capabilities of IBM Log Analysis, and IBM Cloud multi-zone and multi-region architecture.
+
+## Gathering Functional and Non-Functional Requirements
+
+### What is a Functional Requirement?
+
+Addresses the client's problem and what functions the system requires to solve that problem. Large systems can have hundreds of functional requirements.
+
+### What is a Non-Functional Requirement?
+
+Describes how the system must behave, rather than what it must do. Non-functional requirements are measurable and often related to performance, capacity, availability, and system recovery.
+
+### Questions to Gather Functional Requirements
+
+- How should a client interact with the system?
+- What data must be captured?
+- What data must be provided by the architect?
+- What external/internal integrations are required for the system?
+- Who are the system's users?
+
+### Question to Gather Non-Functional Requirements
+
+- How available must the system be?
+- How much data must the system store and for how long?
+- How often must the system be backed up?
+- What are the system's regulations and compliance requirements?
+- What are the data residency requirements?
+- Is there a disaster recovery requirement? If so, what are the Recovery Target Objective (RTO) and Recovery Point Objective (RPO) targets?
+- What are the expected volumetric details for the system?
+
+### Requirement Guidance
+
+**Gathering Functional Requirements**  
+Architects ask questions to fully understand the requirements. Clients may lack complete information of the ability to communicate complete information to the architect. When clients cannot supply functional information, architects must combine research, people skills, and suggestion of choices in order to understand what clients need.
+
+Clients often begin with a sense of what they **want**, which might not be the same as what they **need**. This distinction is sometimes expressed with the term **MoSCoW:** **M**ust have, **S**hould have, **C**ould have, or **W**on't have. This **MSCW** or **MoSCoW** structure helps architects determine the best solution. When an architect organizes the client's wishes into these 4 categories, they set up a successful problem-solbing process.
+
+**Gathering Non-Functional Requirements**
+
+- What is the target availability for the system? (for instance `99.9`, `99.999`).
+- Even if the initial design is a minimal viable product (MVP), architects must understand what a final system will look like.
+- Architects must make assumptions to progress without all the non-functional requirements in place. The earlier these assumptions are made into requirements, the more architects can rely on their decisions.
+
+## Documenting Requirements for a Cloud Solution
+
+### Documentation is an Essential Practice
+
+Architects document functional and non-functional requirements, writing all findings.
+
+Choices of one design option over others are architectural decisions. Architectural decisions should be supported with research, investigation, notes on the existing client environment, and implied requirements.
+
+### Considerations When Documenting Requirements
+
+- Give the clients time and space to determine requirements.
+- Ask questions, write down the requirements, and read them aloud to ensure everyone agrees.
+- Document all requirements, prioritizing them with the **MoSCoW** structure.
+
+<Tip>
+  Typically there is a separate table for functional and non-functional
+  requirements.
+</Tip>
+
+### Sample Table
+
+| Requirement # | Requirement                                       | MoSCoW | Comments                                                                                    |
+| :------------ | :------------------------------------------------ | :----- | :------------------------------------------------------------------------------------------ |
+| 1             | The system must generate and record order numbers | Must   | To be `10` characters long, number formatted                                                |
+| 2             | Orders must relate to an existing customer        | Must   | The system must allow the user to create a new customer if a customer record does not exist |
+
+### Documenting Architectural Decisions
+
+- Architects explain their choices so the clients and team understand the thought process.
+- Architects explain with clear reasons: advantages, disadvantages, risks, and consequences.
+- Architects use metrics to support decisions.
+- Professionals list alternatives to their decisions.
+
+### Architecture Diagrams
+
+**Component Diagrams**  
+Shows the system's components and connections. A high-level diagram shows the different services, and a lower-level diagram shows details of deployment.
+
+**System Context Diagrams**  
+A high-level diagram that shows how the architectural system fits into the environment. Examples include: the different users it will interact with, connections to existing on-premises resources, and connections with other systems already in the cloud.
+
+**System Interaction Diagram**  
+Shows how the user's request goes through the system and uses services. The diagram shows what each service component is for and can help identify missing parts.
+
+# Chapter 2 - Compute Options
+
+- [VPC on IBM Cloud](#vpc-on-ibm-cloud)
+- [IBM Cloud on Container Platforms](#ibm-cloud-on-container-platforms)
+- [IBM Power System Virtual Servers](#ibm-power-system-virtual-servers)
+- [IBM Cloud for VMWare Solutions](#ibm-cloud-for-vmware-solutions)
+
+## VPC on IBM CLoud
+
+### Key Concepts VPC on IBM Cloud
+
+**What is a VPC**  
+VPC is a cloud offering that allows an enterprise to establish its own off-premises private cloud-like environment on a shared public cloud infrastructure - a secure public cloud network where you can define and control a network isolated from other public cloud tenants.
+
+Offerings:
+
+- Bring your own IP address.
+- Public and transit gateways.
+- Security groups.
+- Access control lists (ACLs).
+- Routing.
+
+Servers that can be deployed:
+
+- Bare metal
+- Intel
+- IBM Z
+- LinuxOne
+
+VPC and IBM Cloud
+
+- Designed for cloud-native workloads.
+- Available across several multi-zone regions.
+- REST-based API to create resources.
+- IBM Cloud Direct Link.
+- Integrates with all core IBM Cloud services.
+- Connect IBM Cloud Classic Infrastructure to a transit gateway.
+
+**VPC Architecture**
+
+VPC deployment categories:
+
+- Compute
+- Storage
+- Networking
+
+- **VPC Network** - Clients can create multiple VPCs in the multi-zone regions and create subnets with different zones.
+- **Availability Zone** - Logically and physically isolated location within an IBM Cloud region (fault tolerance).
+- **Subnet** - Clients get high availability, improved security, and reduced latency. Cannot span multiple zones.
+- **Region** - The geographical area in which a VPC is deployed. Can span multiple zones within its assigned region.
+
+Three-Tier Architecture in a VPC
+
+- **Web or presentation tier:** takes requests from web browsers and presents information created by, or stored within, the other layers to users.
+- **Application tier:** contains the business logic and is where most processing takes place.
+- **Database tier:** comprised of database servers that store the data processed in the application tier.
+
+![three-tier-architecture](../images/three-tier-architecture.png)
+
+<Note>
+  To create a three-tier application architecture on a VPC, assign each tier its
+  own subnet (its own IP address space). Each layer is automatically assigned
+  its own unique access control list (ACL).
+</Note>
+
+**VPC Quotas and Service Limits**
+
+- Defaults are set for quotas (contact IBM Support for an increase).
+- Service limits can't be adjusted.
+
+| Responsibility                                                                   | Limit                   |
+| :------------------------------------------------------------------------------- | :---------------------- |
+| VPCs with Classic Access                                                         | 1 per region            |
+| Network Interfaces                                                               | 5 per instance          |
+| PCI Network Interfaces for Bare Metal Servers                                    | 8 per bare metal server |
+| Public Gateways                                                                  | 1 per zone per VPC      |
+| Remote Rules for Security Groups                                                 | 5 per security group    |
+| Secondary Volumes per Instance, Attached when Creating an Instance               | 4 secondary volumes     |
+| Secondary Volumes per Instance, for Existing Instances with Fewer than Four Core | 4 secondary volumes     |
+| Instance Groups for Auto Scale and More                                          | 200 per account         |
+| Instance Group Memberships                                                       | 1000 per instance group |
+
+**VPC Responsibilities**
+
+| Resource                    | Incident and Operations Management | Change Management | Identity and Access Management | Security and Regulation Compliance | Disaster Recovery |
+| :-------------------------- | :--------------------------------- | :---------------- | :----------------------------- | :--------------------------------- | :---------------- |
+| Data                        | Client                             | Client            | Client                         | Client                             | Client            |
+| Application                 | Client                             | Client            | Client                         | Client                             | Client            |
+| Operating System            | Client                             | Client            | Client                         | Client                             | Client            |
+| Virtual Servers             | IBM                                | IBM               | Shared                         | Shared                             | Shared            |
+| Virtual Storage             | IBM                                | IBM               | Shared                         | Shared                             | Shared            |
+| Virtual Network             | IBM                                | IBM               | Shared                         | Shared                             | Shared            |
+| Hypervisor                  | IBM                                | IBM               | IBM                            | IBM                                | IBM               |
+| Physical Servers and Memory | IBM                                | IBM               | IBM                            | IBM                                | IBM               |
+| Physical Storage            | IBM                                | IBM               | IBM                            | IBM                                | IBM               |
+| Physical Network Devices    | IBM                                | IBM               | IBM                            | IBM                                | Shared            |
+| Facilities and Data Centers | IBM                                | IBM               | IBM                            | IBM                                | IBM               |
+
+Tasks Related to Areas of Shared Responsibility
+
+| IBM                                                                                            | Client                                                                            |
+| :--------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------- |
+| Provide access to logs for debugging purpose.                                                  | Use tools like IBM Log Analysis to perform analysis and check logs when needed.   |
+| Fulfill VPC infrastructure subnets and public gateway requests.                                | Adjust networking configurations to meet workload needs.                          |
+| Provide built-in monitoring via virtual server instance or IBM Cloud monitoring.               | Use IBM tools to set permissions, appropriate back up, and restore data.          |
+| Deploy a fully managed, highly available infrastructure.                                       | Ensure destination Cloud Object Storage bucket is properly secured and encrypted. |
+| Provide the ability to bring your own Classless Inter-Domain Routing (CIDR) block to a subnet. | Ensure CIDR blocks from differing networks connected to VPC don't conflict.       |
+| Provide the ability to collect flow log data from various endpoints.                           | Design and deploy workloads programmatically using IBM-provided tools.            |
+|                                                                                                | Monitor the health of workload.                                                   |
+
+**Quiz VPC on IBM Cloud**
+
+<Note>
+What is a virtual private cloud (VPC)?
+
+**A public cloud offering that provides an organization with the ability to establish its own private cloud-like environment on shared public cloud infrastructure.**
+
+What can be used to create resources on VPC on IBM Cloud?
+
+**REST-based API**
+
+Which VPC responsibilities are shared between IBM and the client? Select two answers?
+
+**Disaster Recovery of the virtual network.**  
+**Disaster Recovery of physical network devices.**
+
+</Note>
+
+### VPC Virtual Server Instances
+
+### Subnets and IP Address Features of VPC
+
+### High Availability and Load Balancing

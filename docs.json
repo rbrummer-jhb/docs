@@ -49,6 +49,41 @@
         ]
       },
       {
+        "tab": "AWS",
+        "groups": [
+          {
+            "group": "Study Material",
+            "pages": ["aws/learning-paths", "aws/courses"]
+          },
+          {
+            "group": "AWS DevOps",
+            "pages": ["aws/saa-c03-aws-certified-solutions-architect-assoicate"]
+          }
+        ]
+      },
+      {
+        "tab": "Cisco",
+        "groups": [
+          {
+            "group": "Study Material",
+            "pages": ["cisco/learning-paths"]
+          }
+        ]
+      },
+      {
+        "tab": "IBM",
+        "groups": [
+          {
+            "group": "Study Material",
+            "pages": ["ibm/learning-paths", "ibm/courses"]
+          },
+          {
+            "group": "IBM DevSecOps",
+            "pages": ["ibm/ibm-cloud-professional-architect"]
+          }
+        ]
+      },
+      {
         "tab": "Microsoft",
         "groups": [
           {
@@ -72,15 +107,11 @@
         ]
       },
       {
-        "tab": "AWS",
+        "tab": "Red Hat",
         "groups": [
           {
             "group": "Study Material",
-            "pages": ["aws/learning-paths", "aws/courses"]
-          },
-          {
-            "group": "AWS DevOps",
-            "pages": ["aws/saa-c03-aws-certified-solutions-architect-assoicate"]
+            "pages": ["red-hat/learning-paths", "red-hat/courses"]
           }
         ]
       }

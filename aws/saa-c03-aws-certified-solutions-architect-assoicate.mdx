@@ -5749,3 +5749,135 @@ The more managed a service is, the more checks you get out of the box.
 Basic is 5-minute intervals, whereas detailed is 1-minute.
 
 </Note>
+
+## Application Monitoring with CloudWatch Logs
+
+### What is CloudWatch Logs
+
+A tool that allows you to **monitor**, **store**, and **access log files** from a variety of different sources. It gives you the ability to query your logs to look for **potential issues** or data that is relevant to you.
+
+For custom logs, you use the **Amazon CloudWatch Agent**. The agent enables users to collect and monitor system and application metrics on their AWS instances and on-premises servers.
+
+### CloudWatch Logs Terms
+
+**Log Event**  
+This is the record of what happened. It contains a timestamp and the data.
+
+**Log Stream**  
+A collection of **log events** from the same source creates a **log stream**. Think of one continuous set of logs from a single instance.
+
+**Log Group**  
+This is a collection of **log streams**. For example, you would group all your Apache web server logs across hosts together.
+
+### Features
+
+| Filter Patterns                                                                         | CloudWatch Logs Insights                                                      | Alarms                                                                               |
+| :-------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- | :----------------------------------------------------------------------------------- |
+| You can look for specific terms in your logs. Think 400 errors in your web server logs. | This allows you to query all your logs using a SQL-like interactive solution. | Once you've identified your trends or patterns, it's time to set up alerts for them. |
+
+### Exam Tips
+
+<Note>
+Logs Should Go to CloudWatch Logs
+
+Except for situations where we don't need to process them. Then, they should go straight to **S3**.
+
+You'll need to have a high-level understanding of what services act as a source for CloudWatch Logs.
+
+**Go-To Tool**  
+Generally, favor CloudWatch Logs, unless the exam asks for a real-time solution.
+
+**Alarms**  
+CloudWatch alarms can be used to alert if your filter patterns are found.
+
+</Note>
+
+## Monitoring with Amazon Managed Service for Prometheus and Amazon Managed Grafana
+
+### What is Amazon Managed Grafana
+
+Fully managed AWS service allowing secure data visualizations for instantly **querying, correlating, and visualizing your operational logs, metrics, and traces** from different sources.
+
+### Amazon Managed Grafana Overview
+
+**Grafana Made Easy**  
+Easily, deploy, operate, and scale **Grafana** within your AWS accounts.
+
+**Logical Separation**  
+**Workspaces** (logical Grafana servers) allow for separation of visualizations and querying.
+
+**AWS Managed**  
+AWS handles scaling, setup, maintenance of all workspaces. **You only worry about tasks!**
+
+**Secure**  
+Built-in security features help you meet corporate **governance and compliance requirements**.
+
+**Pricing**  
+Pricing is based per active user in a workspace.
+
+**Data Sources**  
+Integrate it with several sources including **Amazon CloudWatch, Amazon Managed Service for Prometheus, Amazon OpenSearch Service**, and **Amazon Timestream**.
+
+### Use Cases
+
+**Container Metrics Visualizations**  
+Connect to data sources like **Prometheus** for visualizing **EKS, ECS**, or **your own Kubernetes cluster** metrics.
+
+**Internet of Things (IoT)**  
+**Vast data plugins** make the service a perfect fit for **monitoring IoT and edge device data**.
+
+**Troubleshooting**  
+Centralizing dashboards allows for **more efficient** operational issue troubleshooting.
+
+### What is Amazon Managed Service for Prometheus
+
+**Serverless, Prometheus-compatible service** used for securely monitoring container metrics at scale.
+
+### Amazon Managed Service for Prometheus Overview
+
+**Open-Source Prometheus**  
+Leverage the open-source **Prometheus data model** with **AWS-managed scaling and availability**.
+
+**Automatic Scaling**  
+Let AWS manage **automatic scaling** based on **ingestion, storage**, and **querying** of metrics.
+
+**Designed for High Availability**  
+AWS **replicates data across 3 Availability Zones** (AZs) in the same Region. Designed for **availability**.
+
+**Choose your Kubernetes**  
+Works with clusters running on **Amazon EKS** or **self-managed** Kubernetes clusters.
+
+**PromQL**  
+Leverage the open-source **PromQL** query language for exploring and extracting data.
+
+**Data Retention**  
+Data stored in workspaces for **150 days** (automatically deleted afterward).
+
+### Exam Tips
+
+<Note>
+**What is Amazon Managed Grafana?**
+
+Fully managed service for data visualization. Allows instant **querying, correlating**, and **visualizing** of **metrics, logs, and traces**.
+
+**What is Amazon Managed Service for Prometheus?**
+
+**Serverless, Prometheus-compatible service** used for securely monitoring container metrics at scale.
+
+**Security and Scaling**
+
+Both services let AWS handle the **high availability** and **automatic scaling** of infrastructure. Leverage **VPC endpoints** for **secure VPN access**.
+
+**Grafana Data Sources**
+
+Several built-in data sources, including **Amazon CloudWatch, Amazon Managed Service for Prometheus**, and **AWS X-Ray**.
+
+**Amazon Managed Service for Prometheus**
+
+Leverage the service for **Amazon EKS clusters** or even **self-managed Kubernetes clusters**.
+
+**Amazon Managed Grafana Uses**
+
+**Container metric visualizations** (EKS, ECS, or self-hosted Kubernetes clusters), **IoT edge device data**, and **operational teams**.
+
+</Note>
